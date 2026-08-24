@@ -32,9 +32,15 @@
     th { background:#eee; }
     #summary { margin-top:20px; font-size:18px; }
     footer { margin-top:30px; font-size:14px; color:#fff; }
+    #headerBar { display:flex; justify-content:space-between; padding:10px; font-weight:bold; }
   </style>
 </head>
 <body>
+  <div id="headerBar">
+    <span id="greeting"></span>
+    <span id="dateTime"></span>
+  </div>
+
   <h1>📌 نظام الحضور والانصراف</h1>
   <p>💰 مرتبك: <span id="userSalary"></span> جنيه</p>
 
@@ -73,13 +79,23 @@ let currentUser = JSON.parse(localStorage.getItem("loggedUser"));
 let records = JSON.parse(localStorage.getItem("attendance")) || [];
 let checkInTime = null;
 let paidLeaves = 0;
-let checkedIn = false; // حالة الحضور
+let checkedIn = false;
 
 if (!currentUser) {
   window.location.href = "login.html";
 }
 
 document.getElementById("userSalary").innerText = currentUser.salary;
+
+// تحديث التحية والوقت
+function updateHeader() {
+  let now = new Date();
+  let greeting = now.getHours() < 12 ? "☀️ صباح الخير " : "🌙 مساء الخير ";
+  document.getElementById("greeting").innerText = greeting + currentUser.name;
+  document.getElementById("dateTime").innerText = now.toLocaleString("ar-EG");
+}
+updateHeader();
+setInterval(updateHeader, 60000);
 
 function saveData() {
   localStorage.setItem("attendance", JSON.stringify(records));
@@ -200,13 +216,4 @@ function renderTable() {
       <th>التاريخ</th><th>وقت الدخول</th><th>وقت الخروج</th><th>عدد الساعات</th><th>قيمة اليوم</th><th>نوع الإجازة</th><th>السُلفة</th><th>الخصم</th>
     </tr>`;
   let total = 0;
-  records.forEach(r => {
-    table.innerHTML += `<tr>
-      <td>${r.date}</td>
-      <td>${r.in}</td>
-      <td>${r.out}</td>
-      <td>${r.hours}</td>
-      <td>${r.value}</td>
-      <td>${r.leave}</td>
-      <td>${r.loan}</td>
-      <td>${r.d
+  records.forEach(r =>
