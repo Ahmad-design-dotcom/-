@@ -4,22 +4,30 @@
   <meta charset="UTF-8">
   <title>نظام الحضور والانصراف</title>
   <style>
-    body { font-family: Tahoma; direction: rtl; text-align: right; }
-    button { margin: 5px; padding: 10px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #333; padding: 8px; text-align: center; }
-    th { background: #eee; }
+    body { font-family: Tahoma; direction: rtl; text-align: right; background:#f9f9f9; }
+    h1 { color:#4a148c; }
+    button { margin:5px; padding:10px 15px; border:none; border-radius:5px; cursor:pointer; }
+    button:hover { opacity:0.8; }
+    #checkinBtn { background:#4caf50; color:#fff; }
+    #checkoutBtn { background:#f44336; color:#fff; }
+    #leavePaidBtn { background:#2196f3; color:#fff; }
+    #leaveUnpaidBtn { background:#ff9800; color:#fff; }
+    #resetBtn { background:#9c27b0; color:#fff; }
+    table { border-collapse: collapse; width:100%; margin-top:20px; }
+    th, td { border:1px solid #333; padding:8px; text-align:center; }
+    th { background:#eee; }
   </style>
 </head>
 <body>
   <h1>📌 نظام الحضور والانصراف</h1>
 
-  <label>المرتب الشهري: <input type="number" id="monthlySalary" value="5000"></label><br><br>
+  <label>المرتب الشهري: <input type="number" id="monthlySalary" value="6000"></label><br><br>
 
-  <button onclick="checkIn()">تسجيل دخول</button>
-  <button onclick="checkOut()">تسجيل خروج</button>
-  <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
-  <button onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
+  <button id="checkinBtn" onclick="checkIn()">تسجيل دخول</button>
+  <button id="checkoutBtn" onclick="checkOut()">تسجيل خروج</button>
+  <button id="leavePaidBtn" onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
+  <button id="leaveUnpaidBtn" onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
+  <button id="resetBtn" onclick="resetMonth()">إعادة الشهر</button>
 
   <table id="attendanceTable">
     <tr>
@@ -35,8 +43,12 @@
   <h2 id="summary">ملخص المرتب الشهري: 0 جنيه</h2>
 
 <script>
-let records = [];
+let records = JSON.parse(localStorage.getItem("attendance")) || [];
 let checkInTime = null;
+
+function saveData() {
+  localStorage.setItem("attendance", JSON.stringify(records));
+}
 
 function checkIn() {
   checkInTime = new Date();
@@ -47,8 +59,10 @@ function checkOut() {
   if (!checkInTime) { alert("لازم تسجل دخول الأول"); return; }
   let checkOutTime = new Date();
   let hours = (checkOutTime - checkInTime) / (1000*60*60);
+
   let salary = document.getElementById("monthlySalary").value;
-  let dailySalary = (salary / 30).toFixed(2);
+  let hourRate = (salary / 30 / 12).toFixed(2);
+  let dailySalary = (hours * hourRate).toFixed(2);
 
   records.push({
     date: new Date().toLocaleDateString("ar-EG"),
@@ -59,20 +73,33 @@ function checkOut() {
     leave: ""
   });
 
-  renderTable();
   checkInTime = null;
+  renderTable();
+  saveData();
 }
 
 function addLeave(type) {
+  let salary = document.getElementById("monthlySalary").value;
+  let dailySalary = (salary / 30).toFixed(2);
+
   records.push({
     date: new Date().toLocaleDateString("ar-EG"),
     in: "-",
     out: "-",
     hours: "0",
-    value: type === "مدفوعة" ? (document.getElementById("monthlySalary").value / 30).toFixed(2) : "0",
+    value: type === "مدفوعة" ? dailySalary : "0",
     leave: type
   });
   renderTable();
+  saveData();
+}
+
+function resetMonth() {
+  if (confirm("هل أنت متأكد أنك تريد إعادة الشهر من جديد؟ سيتم مسح كل البيانات!")) {
+    records = [];
+    saveData();
+    renderTable();
+  }
 }
 
 function renderTable() {
@@ -101,6 +128,8 @@ function renderTable() {
   });
   document.getElementById("summary").innerText = "ملخص المرتب الشهري: " + total.toFixed(2) + " جنيه";
 }
+
+renderTable();
 </script>
 </body>
 </html>
