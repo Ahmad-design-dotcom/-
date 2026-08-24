@@ -11,6 +11,7 @@
       color: #fff; margin: 0; padding: 20px;
     }
     h1 { font-size: 26px; margin-bottom: 10px; }
+    p { font-size: 16px; margin-bottom: 20px; }
     button {
       display: block; width: 90%; max-width: 300px;
       margin: 10px auto; padding: 12px;
@@ -21,4 +22,181 @@
     #checkinBtn { background:#4caf50; color:#fff; }
     #checkoutBtn { background:#f44336; color:#fff; }
     #logoutBtn { background:#607d8b; color:#fff; }
-    #resetBtn { background:#9
+    #resetBtn { background:#9e9e9e; color:#fff; }
+    table {
+      border-collapse: collapse; width:95%; margin:20px auto;
+      background:#fff; color:#000; border-radius:8px; overflow:hidden;
+    }
+    th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+    th { background:#eee; }
+    #summary { margin-top:20px; font-size:18px; }
+  </style>
+</head>
+<body>
+  <h1>📌 نظام الحضور والانصراف</h1>
+  <p>💰 مرتبك: <span id="userSalary"></span> جنيه</p>
+
+  <button id="checkinBtn" onclick="checkIn()">حضور</button>
+  <button id="checkoutBtn" onclick="checkOut()">انصراف</button>
+  <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
+  <button onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
+  <button onclick="addLoan()">إضافة سُلفة</button>
+  <button onclick="addDeduction()">إضافة خصم</button>
+  <button id="resetBtn" onclick="resetMonth()">إعادة الشهر من جديد</button>
+  <button id="logoutBtn" onclick="logout()">تسجيل الخروج من الحساب</button>
+
+  <table id="attendanceTable">
+    <tr>
+      <th>التاريخ</th>
+      <th>وقت الدخول</th>
+      <th>وقت الخروج</th>
+      <th>عدد الساعات</th>
+      <th>قيمة اليوم</th>
+      <th>نوع الإجازة</th>
+      <th>السُلفة</th>
+      <th>الخصم</th>
+    </tr>
+  </table>
+
+  <h2 id="summary">ملخص المرتب الشهري: 0 جنيه</h2>
+
+<script>
+let currentUser = JSON.parse(localStorage.getItem("loggedUser"));
+let records = JSON.parse(localStorage.getItem("attendance")) || [];
+let checkInTime = null;
+let paidLeaves = 0;
+
+if (!currentUser) {
+  window.location.href = "login.html";
+}
+
+document.getElementById("userSalary").innerText = currentUser.salary;
+
+function saveData() {
+  localStorage.setItem("attendance", JSON.stringify(records));
+}
+
+function checkIn() {
+  if (confirm("هل تريد تسجيل حضور الآن؟")) {
+    checkInTime = new Date();
+    alert("✅ تم تسجيل الحضور: " + checkInTime.toLocaleTimeString("ar-EG"));
+  }
+}
+
+function checkOut() {
+  if (!checkInTime) { alert("لازم تسجل حضور الأول"); return; }
+  if (confirm("هل تريد تسجيل انصراف الآن؟")) {
+    let checkOutTime = new Date();
+    let hoursWorked = (checkOutTime - checkInTime) / (1000*60*60);
+    let hourRate = currentUser.salary / 30 / currentUser.hours;
+    let dailySalary = (hoursWorked * hourRate).toFixed(2);
+
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in: checkInTime.toLocaleTimeString("ar-EG"),
+      out: checkOutTime.toLocaleTimeString("ar-EG"),
+      hours: hoursWorked.toFixed(2),
+      value: dailySalary,
+      leave: "",
+      loan: "",
+      deduction: ""
+    });
+    saveData();
+    renderTable();
+    checkInTime = null;
+  }
+}
+
+function addLeave(type) {
+  if (type === "مدفوعة") {
+    if (paidLeaves >= 4) {
+      alert("❌ تم استنفاذ رصيد الإجازات المدفوعة لهذا الشهر!");
+      return;
+    }
+    paidLeaves++;
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in:"-", out:"-", hours:"0",
+      value:(currentUser.salary/30).toFixed(2),
+      leave:type, loan:"", deduction:""
+    });
+  } else {
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in:"-", out:"-", hours:"0",
+      value:"0", leave:type, loan:"", deduction:""
+    });
+  }
+  saveData();
+  renderTable();
+}
+
+function addLoan() {
+  let loan = prompt("أدخل قيمة السُلفة:");
+  if (loan) {
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in:"-", out:"-", hours:"0",
+      value:"0", leave:"", loan:loan, deduction:""
+    });
+    saveData();
+    renderTable();
+  }
+}
+
+function addDeduction() {
+  let deduction = prompt("أدخل قيمة الخصم:");
+  if (deduction) {
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in:"-", out:"-", hours:"0",
+      value:"0", leave:"", loan:"", deduction:deduction
+    });
+    saveData();
+    renderTable();
+  }
+}
+
+function resetMonth() {
+  if (confirm("⚠️ هل أنت متأكد أنك تريد إعادة الشهر من جديد؟ سيتم مسح كل البيانات!")) {
+    records = [];
+    paidLeaves = 0;
+    localStorage.removeItem("attendance");
+    renderTable();
+    alert("✅ تم إعادة الشهر بنجاح، يمكنك البدء من جديد!");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("loggedUser");
+  window.location.href = "login.html";
+}
+
+function renderTable() {
+  let table = document.getElementById("attendanceTable");
+  table.innerHTML = `<tr>
+      <th>التاريخ</th><th>وقت الدخول</th><th>وقت الخروج</th><th>عدد الساعات</th><th>قيمة اليوم</th><th>نوع الإجازة</th><th>السُلفة</th><th>الخصم</th>
+    </tr>`;
+  let total = 0;
+  records.forEach(r => {
+    table.innerHTML += `<tr>
+      <td>${r.date}</td>
+      <td>${r.in}</td>
+      <td>${r.out}</td>
+      <td>${r.hours}</td>
+      <td>${r.value}</td>
+      <td>${r.leave}</td>
+      <td>${r.loan}</td>
+      <td>${r.deduction}</td>
+    </tr>`;
+    total += parseFloat(r.value) || 0;
+    if (r.loan) total -= parseFloat(r.loan);
+    if (r.deduction) total -= parseFloat(r.deduction);
+  });
+  document.getElementById("summary").innerText = "ملخص المرتب الشهري: " + total.toFixed(2) + " جنيه";
+}
+
+renderTable();
+</script>
+</body>
+</html>
