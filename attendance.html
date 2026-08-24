@@ -18,6 +18,7 @@
       display: flex;
       flex-direction: column;
       color: #333;
+      padding-bottom: 80px;
     }
 
     .container {
@@ -239,10 +240,57 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
 
-    .footer a {
-      color: #667eea;
+    /* زر الواتساب العائم */
+    .whatsapp-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25d366 0%, #1faa51 100%);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      transition: all 0.3s ease;
+      z-index: 999;
       text-decoration: none;
+    }
+
+    .whatsapp-btn:hover {
+      transform: scale(1.15) translateY(-5px);
+      box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+    }
+
+    .whatsapp-btn:active {
+      transform: scale(0.95);
+    }
+
+    .whatsapp-tooltip {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      background: #25d366;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+      z-index: 998;
+    }
+
+    .whatsapp-btn:hover ~ .whatsapp-tooltip,
+    .whatsapp-tooltip:hover {
+      opacity: 1;
     }
 
     /* Responsive Design */
@@ -282,6 +330,21 @@
       .summary-value {
         font-size: 28px;
       }
+
+      .whatsapp-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 28px;
+        bottom: 25px;
+        right: 15px;
+      }
+
+      .whatsapp-tooltip {
+        bottom: 90px;
+        right: 15px;
+        font-size: 12px;
+        padding: 8px 12px;
+      }
     }
 
     @media (max-width: 360px) {
@@ -309,6 +372,21 @@
 
       .summary-value {
         font-size: 24px;
+      }
+
+      .whatsapp-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        bottom: 20px;
+        right: 12px;
+      }
+
+      .whatsapp-tooltip {
+        bottom: 80px;
+        right: 12px;
+        font-size: 11px;
+        padding: 7px 10px;
       }
     }
   </style>
@@ -374,16 +452,45 @@
     </div>
   </div>
 
+  <!-- زر الواتساب العائم -->
+  <a href="https://wa.me/201102975929?text=مرحباً أحمد، أنا بحاجة للمساعدة" class="whatsapp-btn" target="_blank" title="تواصل معنا عبر الواتساب">
+    💬
+  </a>
+  <div class="whatsapp-tooltip">تواصل معنا</div>
+
 <script>
-let currentUser = JSON.parse(localStorage.getItem("loggedUser"));
+// ✅ الحل: استخدام sessionStorage مع localStorage
+let currentUser = null;
 let records = JSON.parse(localStorage.getItem("attendance")) || [];
 let checkInTime = null;
 let paidLeaves = 0;
 let checkedIn = false;
 
-if (!currentUser) {
-  alert("⚠️ لم يتم العثور على بيانات المستخدم، برجاء تسجيل الدخول أولًا!");
-  window.location.href = "login.html";
+// تحميل بيانات المستخدم - جرب sessionStorage أولاً ثم localStorage
+function loadCurrentUser() {
+  // تحقق من sessionStorage أولاً (الجلسة الحالية)
+  currentUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+  
+  // إذا لم توجد، تحقق من localStorage (من جلسات سابقة)
+  if (!currentUser) {
+    currentUser = JSON.parse(localStorage.getItem("loggedUser"));
+  }
+  
+  // إذا كان هناك مستخدم، احفظه في sessionStorage أيضاً
+  if (currentUser) {
+    sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
+    localStorage.setItem("loggedUser", JSON.stringify(currentUser)); // احفظ أيضاً في localStorage
+  } else {
+    alert("⚠️ لم يتم العثور على بيانات المستخدم، برجاء تسجيل الدخول أولًا!");
+    window.location.href = "login.html";
+    return false;
+  }
+  return true;
+}
+
+// تحميل المستخدم عند فتح الصفحة
+if (!loadCurrentUser()) {
+  throw new Error("لم يتم تحميل بيانات المستخدم");
 }
 
 document.getElementById("userSalary").innerText = currentUser.salary;
@@ -392,8 +499,8 @@ document.getElementById("userSalary").innerText = currentUser.salary;
 function updateHeader() {
   let now = new Date();
   let days = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
-  let greeting = now.getHours() < 12 ? "☀️ صباح الخير" : (now.getHours() < 17 ? "🌤️ بعد الظهر" : "🌙 مساء الخير");
-  document.getElementById("greeting").innerText = greeting + " يا " + currentUser.name;
+  let greeting = now.getHours() < 12 ? "☀️ صباح الخير يا " : "🌙 مساء الخير يا ";
+  document.getElementById("greeting").innerText = greeting + currentUser.name;
   document.getElementById("dateTime").innerText =
     `${days[now.getDay()]} - ${now.toLocaleDateString("ar-EG")} - ${now.toLocaleTimeString("ar-EG")}`;
 }
@@ -401,18 +508,27 @@ updateHeader();
 setInterval(updateHeader, 60000);
 
 function saveData() {
+  // احفظ في localStorage (دائم)
   localStorage.setItem("attendance", JSON.stringify(records));
+  // احفظ أيضاً في sessionStorage (الجلسة الحالية)
+  sessionStorage.setItem("attendance", JSON.stringify(records));
 }
 
 function checkIn() {
-  if (checkedIn) { alert("❌ لازم تعمل انصراف قبل حضور جديد."); return; }
+  if (checkedIn) { 
+    alert("❌ لازم تعمل انصراف قبل حضور جديد."); 
+    return; 
+  }
   checkInTime = new Date();
   checkedIn = true;
   alert("✅ حضور: " + checkInTime.toLocaleTimeString("ar-EG"));
 }
 
 function checkOut() {
-  if (!checkedIn) { alert("❌ لازم تسجل حضور الأول."); return; }
+  if (!checkedIn) { 
+    alert("❌ لازم تسجل حضور الأول."); 
+    return; 
+  }
   let checkOutTime = new Date();
   let hoursWorked = (checkOutTime - checkInTime) / (1000*60*60);
   let hourRate = currentUser.salary / 30 / currentUser.hours;
@@ -437,20 +553,51 @@ function checkOut() {
 
 function addLeave(type) {
   if (type === "مدفوعة") {
-    if (paidLeaves >= 4) { alert("❌ استنفذت رصيد الإجازات المدفوعة."); return; }
+    if (paidLeaves >= 4) { 
+      alert("❌ استنفذت رصيد الإجازات المدفوعة."); 
+      return; 
+    }
     paidLeaves++;
-    records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:(currentUser.salary/30).toFixed(2), leave:type, loan:"", deduction:"" });
+    records.push({ 
+      date:new Date().toLocaleDateString("ar-EG"), 
+      in:"-", 
+      out:"-", 
+      hours:"0", 
+      value:(currentUser.salary/30).toFixed(2), 
+      leave:type, 
+      loan:"", 
+      deduction:"" 
+    });
   } else {
-    records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:type, loan:"", deduction:"" });
+    records.push({ 
+      date:new Date().toLocaleDateString("ar-EG"), 
+      in:"-", 
+      out:"-", 
+      hours:"0", 
+      value:"0", 
+      leave:type, 
+      loan:"", 
+      deduction:"" 
+    });
   }
-  saveData(); renderTable();
+  saveData(); 
+  renderTable();
   alert("✅ تم إضافة إجازة " + type);
 }
 
 function addLoan() {
   let loan = prompt("أدخل قيمة السُلفة:");
   if (loan && loan > 0) { 
-    records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:loan, deduction:"" }); 
+    records.push({ 
+      date:new Date().toLocaleDateString("ar-EG"), 
+      in:"-", 
+      out:"-", 
+      hours:"0", 
+      value:"0", 
+      leave:"", 
+      loan:loan, 
+      deduction:"" 
+    }); 
     saveData(); 
     renderTable(); 
     alert("✅ تم إضافة سُلفة: " + loan + " جنيه");
@@ -460,7 +607,16 @@ function addLoan() {
 function addDeduction() {
   let deduction = prompt("أدخل قيمة الخصم:");
   if (deduction && deduction > 0) { 
-    records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:"", deduction:deduction }); 
+    records.push({ 
+      date:new Date().toLocaleDateString("ar-EG"), 
+      in:"-", 
+      out:"-", 
+      hours:"0", 
+      value:"0", 
+      leave:"", 
+      loan:"", 
+      deduction:deduction 
+    }); 
     saveData(); 
     renderTable(); 
     alert("✅ تم إضافة خصم: " + deduction + " جنيه");
@@ -472,6 +628,7 @@ function resetMonth() {
     records = [];
     paidLeaves = 0;
     localStorage.removeItem("attendance");
+    sessionStorage.removeItem("attendance");
     renderTable();
     alert("✅ تم إعادة الشهر بنجاح!");
   }
@@ -479,7 +636,9 @@ function resetMonth() {
 
 function logout() {
   if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+    // احذف من كلا المكانين
     localStorage.removeItem("loggedUser");
+    sessionStorage.removeItem("loggedUser");
     alert("👋 تم تسجيل الخروج بنجاح!");
     window.location.href = "login.html";
   }
