@@ -8,7 +8,8 @@
     h1 { font-size:26px; margin-bottom:10px; }
     input,button { display:block; width:90%; max-width:300px; margin:10px auto; padding:10px; border-radius:8px; border:none; }
     button { background:#4caf50; color:#fff; font-size:16px; cursor:pointer; }
-    a { color:#fff; text-decoration:underline; }
+    #homeBtn { background:#1976d2; margin-top:15px; }
+    a { color:#fff; text-decoration:underline; display:block; margin-top:15px; }
   </style>
 </head>
 <body>
@@ -21,19 +22,31 @@
     <button type="submit">إنشاء الحساب</button>
   </form>
   <a href="login.html">لدي حساب بالفعل؟ تسجيل دخول</a>
+  <button id="homeBtn" onclick="window.location.href='index.html'">🏠 العودة للصفحة الرئيسية</button>
 
 <script>
 let users = JSON.parse(localStorage.getItem("users")) || [];
 function register() {
+  let name = document.getElementById("regName").value;
+  let password = document.getElementById("regPassword").value;
+  let salary = document.getElementById("regSalary").value;
+  let hours = document.getElementById("regHours").value;
+  
+  // التحقق من عدم وجود حساب بنفس الاسم
+  if (users.find(u => u.name === name)) {
+    alert("❌ هذا الاسم موجود بالفعل!");
+    return;
+  }
+  
   let user = {
-    name: document.getElementById("regName").value,
-    password: document.getElementById("regPassword").value,
-    salary: document.getElementById("regSalary").value,
-    hours: document.getElementById("regHours").value
+    name: name,
+    password: password,
+    salary: salary,
+    hours: hours
   };
   users.push(user);
   localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("loggedUser", JSON.stringify(user)); // حفظ المستخدم الحالي
+  localStorage.setItem("loggedUser", JSON.stringify(user));
   alert("✅ تم إنشاء الحساب بنجاح!");
   window.location.href = "attendance.html";
 }
