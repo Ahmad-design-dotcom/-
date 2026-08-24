@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إنشاء حساب</title>
+</head>
+<body>
+  <h1>📝 إنشاء حساب جديد</h1>
+  <form onsubmit="register(); return false;">
+    <input type="text" id="regName" placeholder="الاسم الكامل" required><br>
+    <input type="text" id="regPhone" placeholder="رقم الهاتف"><br>
+    <input type="email" id="regEmail" placeholder="البريد الإلكتروني"><br>
+    <input type="password" id="regPassword" placeholder="كلمة السر" required><br>
+    <input type="number" id="regSalary" placeholder="المرتب الشهري" required><br>
+    <input type="number" id="regHours" placeholder="عدد ساعات العمل الفعلية" required><br><br>
+    <button type="submit">إنشاء الحساب</button>
+  </form>
+  <button onclick="goToLogin()">لدي حساب بالفعل</button>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+function register() {
+  let user = {
+    name: document.getElementById("regName").value,
+    phone: document.getElementById("regPhone").value,
+    email: document.getElementById("regEmail").value,
+    password: document.getElementById("regPassword").value,
+    salary: document.getElementById("regSalary").value,
+    hours: document.getElementById("regHours").value
+  };
+  users.push(user);
+  localStorage.setItem("users", JSON.stringify(users));
+  alert("✅ تم إنشاء الحساب بنجاح!");
+  window.location.href = "login.html";
+}
+
+function goToLogin() {
+  window.location.href = "login.html";
+}
+</script>
+</body>
+</html>
