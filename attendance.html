@@ -6,32 +6,21 @@
   <style>
     body {
       font-family: 'Tahoma', sans-serif;
-      direction: rtl;
-      text-align: center;
+      direction: rtl; text-align: center;
       background: linear-gradient(135deg, #4a148c, #2196f3);
-      color: #fff;
-      margin: 0;
-      padding: 20px;
+      color: #fff; margin: 0; padding: 20px;
     }
     #headerBar {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 20px;
-      font-weight: bold;
+      display: flex; justify-content: space-between;
+      padding: 10px 20px; font-weight: bold;
     }
     h1 { font-size: 26px; margin-bottom: 10px; }
     p { font-size: 16px; margin-bottom: 20px; }
     button {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 10px auto;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
+      display: block; width: 90%; max-width: 300px;
+      margin: 10px auto; padding: 12px;
+      font-size: 16px; border: none; border-radius: 8px;
+      cursor: pointer; transition: 0.3s;
     }
     button:hover { opacity: 0.85; }
     #checkinBtn { background:#4caf50; color:#fff; }
@@ -40,18 +29,13 @@
     #resetBtn { background:#9e9e9e; color:#fff; }
     #whatsappBtn { background:#25D366; color:#fff; }
     table {
-      border-collapse: collapse;
-      width: 95%;
-      margin: 20px auto;
-      background: #fff;
-      color: #000;
-      border-radius: 8px;
-      overflow: hidden;
+      border-collapse: collapse; width:95%; margin:20px auto;
+      background:#fff; color:#000; border-radius:8px; overflow:hidden;
     }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    th { background: #eee; }
-    #summary { margin-top: 20px; font-size: 18px; }
-    footer { margin-top: 30px; font-size: 14px; color: #fff; }
+    th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+    th { background:#eee; }
+    #summary { margin-top:20px; font-size:18px; }
+    footer { margin-top:30px; font-size:14px; color:#fff; }
   </style>
 </head>
 <body>
@@ -213,4 +197,9 @@ function addDeduction() {
 }
 
 function resetMonth() {
-  if (confirm("⚠️ هل أنت متأكد أنك تريد إعادة الشهر من جديد؟ سيتم مسح كل
+  if (confirm("⚠️ هل أنت متأكد أنك تريد إعادة الشهر من جديد؟ سيتم مسح كل البيانات!")) {
+    records = [];
+    paidLeaves = 0;
+    localStorage.removeItem("attendance");
+    renderTable();
+    alert("
