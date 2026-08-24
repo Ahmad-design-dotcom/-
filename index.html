@@ -19,6 +19,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      padding-bottom: 100px;
     }
 
     .container {
@@ -205,8 +206,77 @@
       text-decoration: underline;
     }
 
+    /* زر الواتساب العائم */
+    .whatsapp-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25d366 0%, #1faa51 100%);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      transition: all 0.3s ease;
+      z-index: 999;
+      text-decoration: none;
+    }
+
+    .whatsapp-btn:hover {
+      transform: scale(1.15) translateY(-5px);
+      box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+    }
+
+    .whatsapp-btn:active {
+      transform: scale(0.95);
+    }
+
+    .whatsapp-tooltip {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      background: #25d366;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+      z-index: 998;
+    }
+
+    .whatsapp-btn:hover ~ .whatsapp-tooltip,
+    .whatsapp-tooltip:hover {
+      opacity: 1;
+    }
+
+    .whatsapp-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      right: 15px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 0px solid transparent;
+      border-top: 8px solid #25d366;
+    }
+
     /* Responsive Design */
     @media (max-width: 480px) {
+      body {
+        padding-bottom: 80px;
+      }
+
       .card {
         padding: 30px 20px;
       }
@@ -227,6 +297,25 @@
 
       .features-list {
         grid-template-columns: 1fr;
+      }
+
+      .whatsapp-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 28px;
+        bottom: 25px;
+        right: 15px;
+      }
+
+      .whatsapp-tooltip {
+        bottom: 90px;
+        right: 15px;
+        font-size: 12px;
+        padding: 8px 12px;
+      }
+
+      .whatsapp-tooltip::after {
+        right: 12px;
       }
     }
 
@@ -262,6 +351,21 @@
 
       .btn-description {
         display: none;
+      }
+
+      .whatsapp-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        bottom: 20px;
+        right: 12px;
+      }
+
+      .whatsapp-tooltip {
+        bottom: 80px;
+        right: 12px;
+        font-size: 11px;
+        padding: 7px 10px;
       }
     }
   </style>
@@ -340,6 +444,12 @@
       </div>
     </div>
   </div>
+
+  <!-- زر الواتساب العائم -->
+  <a href="https://wa.me/201102975929?text=مرحباً أحمد، أنا بحاجة للمساعدة" class="whatsapp-btn" target="_blank" title="تواصل معنا عبر الواتساب">
+    💬
+  </a>
+  <div class="whatsapp-tooltip">تواصل معنا</div>
 
   <script>
     function goToAttendance() {
