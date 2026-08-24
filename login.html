@@ -8,7 +8,8 @@
     h1 { font-size:26px; margin-bottom:10px; }
     input,button { display:block; width:90%; max-width:300px; margin:10px auto; padding:10px; border-radius:8px; border:none; }
     button { background:#2196f3; color:#fff; font-size:16px; cursor:pointer; }
-    a { color:#fff; text-decoration:underline; }
+    #homeBtn { background:#1976d2; margin-top:15px; }
+    a { color:#fff; text-decoration:underline; display:block; margin-top:15px; }
   </style>
 </head>
 <body>
@@ -19,6 +20,7 @@
     <button type="submit">دخول</button>
   </form>
   <a href="register.html">ليس لديك حساب؟ أنشئ حساب جديد</a>
+  <button id="homeBtn" onclick="window.location.href='index.html'">🏠 العودة للصفحة الرئيسية</button>
 
 <script>
 let users = JSON.parse(localStorage.getItem("users")) || [];
