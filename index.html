@@ -4,30 +4,51 @@
   <meta charset="UTF-8">
   <title>نظام الحضور والانصراف</title>
   <style>
-    body { font-family: Tahoma; direction: rtl; text-align: right; background:#f9f9f9; }
-    h1 { color:#4a148c; }
-    button { margin:5px; padding:10px 15px; border:none; border-radius:5px; cursor:pointer; }
-    button:hover { opacity:0.8; }
+    body { font-family: 'Tahoma', sans-serif; direction: rtl; text-align: right; background:#f4f6f9; margin:0; }
+    h1 { color:#4a148c; text-align:center; padding:20px; }
+    button { margin:5px; padding:10px 15px; border:none; border-radius:5px; cursor:pointer; font-size:14px; }
+    button:hover { opacity:0.85; }
     #checkinBtn { background:#4caf50; color:#fff; }
     #checkoutBtn { background:#f44336; color:#fff; }
     #leavePaidBtn { background:#2196f3; color:#fff; }
     #leaveUnpaidBtn { background:#ff9800; color:#fff; }
+    #loanBtn { background:#795548; color:#fff; }
+    #deductionBtn { background:#607d8b; color:#fff; }
     #resetBtn { background:#9c27b0; color:#fff; }
-    table { border-collapse: collapse; width:100%; margin-top:20px; }
-    th, td { border:1px solid #333; padding:8px; text-align:center; }
+    table { border-collapse: collapse; width:95%; margin:20px auto; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+    th, td { border:1px solid #ccc; padding:10px; text-align:center; }
     th { background:#eee; }
+    #summary { text-align:center; margin:20px; color:#333; }
+    footer { background:#222; color:#fff; text-align:center; padding:15px; margin-top:30px; font-size:14px; }
+    footer a { color:#4caf50; text-decoration:none; }
+    #loginScreen { text-align:center; padding:50px; }
+    #mainApp { display:none; }
   </style>
 </head>
 <body>
+
+<div id="loginScreen">
+  <h1>🔐 تسجيل حضور وانصراف موظف</h1>
+  <p>👤 الاسم: أحمد حاتم عبدالعظيم</p>
+  <p>📞 رقم الهاتف: 01102975929</p>
+  <p>✉️ البريد: ahmadhatem973@gmail.com</p>
+  <input type="password" id="password" placeholder="أدخل كلمة السر"><br><br>
+  <button onclick="login()">دخول</button>
+</div>
+
+<div id="mainApp">
   <h1>📌 نظام الحضور والانصراف</h1>
 
-  <label>المرتب الشهري: <input type="number" id="monthlySalary" value="6000"></label><br><br>
-
-  <button id="checkinBtn" onclick="checkIn()">تسجيل دخول</button>
-  <button id="checkoutBtn" onclick="checkOut()">تسجيل خروج</button>
-  <button id="leavePaidBtn" onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
-  <button id="leaveUnpaidBtn" onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
-  <button id="resetBtn" onclick="resetMonth()">إعادة الشهر</button>
+  <div style="text-align:center;">
+    <label>💰 المرتب الشهري: <input type="number" id="monthlySalary" value="6000"></label><br><br>
+    <button id="checkinBtn" onclick="checkIn()">تسجيل دخول</button>
+    <button id="checkoutBtn" onclick="checkOut()">تسجيل خروج</button>
+    <button id="leavePaidBtn" onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
+    <button id="leaveUnpaidBtn" onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
+    <button id="loanBtn" onclick="addLoan()">إضافة سُلفة</button>
+    <button id="deductionBtn" onclick="addDeduction()">إضافة خصم</button>
+    <button id="resetBtn" onclick="resetMonth()">إعادة الشهر</button>
+  </div>
 
   <table id="attendanceTable">
     <tr>
@@ -37,17 +58,35 @@
       <th>عدد الساعات</th>
       <th>قيمة اليوم</th>
       <th>نوع الإجازة</th>
+      <th>السُلفة</th>
+      <th>الخصم</th>
     </tr>
   </table>
 
   <h2 id="summary">ملخص المرتب الشهري: 0 جنيه</h2>
 
+  <footer>
+    👨‍💻 المطور: أحمد حاتم عبدالعظيم | 📞 <a href="tel:01102975929">01102975929</a> | ✉️ <a href="mailto:ahmadhatem973@gmail.com">ahmadhatem973@gmail.com</a>
+  </footer>
+</div>
+
 <script>
 let records = JSON.parse(localStorage.getItem("attendance")) || [];
 let checkInTime = null;
+let paidLeaves = records.filter(r => r.leave === "مدفوعة").length;
 
 function saveData() {
   localStorage.setItem("attendance", JSON.stringify(records));
+}
+
+function login() {
+  let pass = document.getElementById("password").value;
+  if (pass === "1234") { // كلمة السر الافتراضية
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+  } else {
+    alert("❌ كلمة السر غير صحيحة!");
+  }
 }
 
 function checkIn() {
@@ -70,7 +109,9 @@ function checkOut() {
     out: checkOutTime.toLocaleTimeString("ar-EG"),
     hours: hours.toFixed(2),
     value: dailySalary,
-    leave: ""
+    leave: "",
+    loan: "",
+    deduction: ""
   });
 
   checkInTime = null;
@@ -79,6 +120,14 @@ function checkOut() {
 }
 
 function addLeave(type) {
+  if (type === "مدفوعة") {
+    if (paidLeaves >= 4) {
+      alert("❌ تم نفاذ رصيد الإجازات المدفوعة لهذا الشهر!");
+      return;
+    }
+    paidLeaves++;
+  }
+
   let salary = document.getElementById("monthlySalary").value;
   let dailySalary = (salary / 30).toFixed(2);
 
@@ -88,15 +137,54 @@ function addLeave(type) {
     out: "-",
     hours: "0",
     value: type === "مدفوعة" ? dailySalary : "0",
-    leave: type
+    leave: type,
+    loan: "",
+    deduction: ""
   });
   renderTable();
   saveData();
 }
 
+function addLoan() {
+  let loan = prompt("أدخل قيمة السُلفة:");
+  if (loan) {
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in: "-",
+      out: "-",
+      hours: "0",
+      value: "0",
+      leave: "",
+      loan: loan,
+      deduction: ""
+    });
+    renderTable();
+    saveData();
+  }
+}
+
+function addDeduction() {
+  let deduction = prompt("أدخل قيمة الخصم:");
+  if (deduction) {
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in: "-",
+      out: "-",
+      hours: "0",
+      value: "0",
+      leave: "",
+      loan: "",
+      deduction: deduction
+    });
+    renderTable();
+    saveData();
+  }
+}
+
 function resetMonth() {
-  if (confirm("هل أنت متأكد أنك تريد إعادة الشهر من جديد؟ سيتم مسح كل البيانات!")) {
+  if (confirm("⚠️ هل أنت متأكد أنك تريد إعادة الشهر من جديد؟ سيتم مسح كل البيانات!")) {
     records = [];
+    paidLeaves = 0;
     saveData();
     renderTable();
   }
@@ -109,27 +197,4 @@ function renderTable() {
       <th>التاريخ</th>
       <th>وقت الدخول</th>
       <th>وقت الخروج</th>
-      <th>عدد الساعات</th>
-      <th>قيمة اليوم</th>
-      <th>نوع الإجازة</th>
-    </tr>`;
-  let total = 0;
-  records.forEach(r => {
-    table.innerHTML += `
-      <tr>
-        <td>${r.date}</td>
-        <td>${r.in}</td>
-        <td>${r.out}</td>
-        <td>${r.hours}</td>
-        <td>${r.value}</td>
-        <td>${r.leave}</td>
-      </tr>`;
-    total += parseFloat(r.value);
-  });
-  document.getElementById("summary").innerText = "ملخص المرتب الشهري: " + total.toFixed(2) + " جنيه";
-}
-
-renderTable();
-</script>
-</body>
-</html>
+      <th>عدد الساعات
