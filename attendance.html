@@ -521,17 +521,19 @@ let currentUser = null;
 let records = JSON.parse(localStorage.getItem("attendance")) || [];
 let dailyRecords = {}; // لتسجيل الحضور والانصراف لكل يوم
 
-// تحميل بيانات المستخدم
+// تحميل بيانات المستخدم - تم التصحيح للحفظ الدائم ومنع مسح الحضور
 function loadCurrentUser() {
-  currentUser = JSON.parse(sessionStorage.getItem("loggedUser"));
+  // قراءة البيانات من الـ localStorage الدائمة أولاً بدلاً من الـ sessionStorage المؤقتة
+  currentUser = JSON.parse(localStorage.getItem("loggedUser"));
   
   if (!currentUser) {
-    currentUser = JSON.parse(localStorage.getItem("loggedUser"));
+    currentUser = JSON.parse(sessionStorage.getItem("loggedUser"));
   }
   
   if (currentUser) {
-    sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
+    // الاحتفاظ بها في الذاكرتين معاً لضمان عدم ضياع الجلسة عند الخروج والعودة
     localStorage.setItem("loggedUser", JSON.stringify(currentUser));
+    sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
   } else {
     alert("⚠️ لم يتم العثور على بيانات المستخدم، برجاء تسجيل الدخول أولًا!");
     window.location.href = "login.html";
@@ -544,7 +546,12 @@ if (!loadCurrentUser()) {
   throw new Error("لم يتم تحميل بيانات المستخدم");
 }
 
-document.getElementById("userSalary").innerText = currentUser.salary;
+// التأكد من وجود العنصر في صفحتك قبل طباعة الراتب تجنباً لأي توقف برمجى
+const userSalaryEl = document.getElementById("userSalary");
+if (userSalaryEl) {
+  userSalaryEl.innerText = currentUser.salary;
+}
+
 
 // تحديث التحية والوقت
 function updateHeader() {
