@@ -2,20 +2,61 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>إنشاء حساب</title>
+  <title>إنشاء حساب جديد</title>
+  <style>
+    body {
+      font-family: 'Tahoma', sans-serif;
+      direction: rtl;
+      text-align: center;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 40px 10px;
+    }
+    h1 {
+      color: #4caf50;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    input {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    button {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 15px auto;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #4caf50;
+      color: #fff;
+      transition: 0.3s;
+    }
+    button:hover { opacity: 0.85; }
+    a { color: #2196f3; text-decoration: none; font-size: 14px; }
+  </style>
 </head>
 <body>
   <h1>📝 إنشاء حساب جديد</h1>
   <form onsubmit="register(); return false;">
-    <input type="text" id="regName" placeholder="الاسم الكامل" required><br>
-    <input type="text" id="regPhone" placeholder="رقم الهاتف"><br>
-    <input type="email" id="regEmail" placeholder="البريد الإلكتروني"><br>
-    <input type="password" id="regPassword" placeholder="كلمة السر" required><br>
-    <input type="number" id="regSalary" placeholder="المرتب الشهري" required><br>
-    <input type="number" id="regHours" placeholder="عدد ساعات العمل الفعلية" required><br><br>
+    <input type="text" id="regName" placeholder="الاسم الكامل" required>
+    <input type="text" id="regPhone" placeholder="رقم الهاتف">
+    <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+    <input type="password" id="regPassword" placeholder="كلمة السر" required>
+    <input type="number" id="regSalary" placeholder="المرتب الشهري" required>
+    <input type="number" id="regHours" placeholder="عدد ساعات العمل الفعلية" required>
     <button type="submit">إنشاء الحساب</button>
   </form>
-  <button onclick="goToLogin()">لدي حساب بالفعل</button>
+  <a href="login.html">لدي حساب بالفعل؟ تسجيل دخول</a>
 
 <script>
 let users = JSON.parse(localStorage.getItem("users")) || [];
@@ -32,10 +73,6 @@ function register() {
   users.push(user);
   localStorage.setItem("users", JSON.stringify(users));
   alert("✅ تم إنشاء الحساب بنجاح!");
-  window.location.href = "login.html";
-}
-
-function goToLogin() {
   window.location.href = "login.html";
 }
 </script>
