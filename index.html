@@ -27,7 +27,8 @@
   <input type="text" id="regName" placeholder="الاسم الكامل"><br>
   <input type="text" id="regPhone" placeholder="رقم الهاتف"><br>
   <input type="email" id="regEmail" placeholder="البريد الإلكتروني"><br>
-  <input type="password" id="regPassword" placeholder="كلمة السر"><br><br>
+  <input type="password" id="regPassword" placeholder="كلمة السر"><br>
+  <input type="number" id="regSalary" placeholder="المرتب الشهري"><br><br>
   <button onclick="register()">إنشاء الحساب</button><br><br>
   <button onclick="goToLogin()">لدي حساب بالفعل</button>
 </div>
@@ -45,7 +46,7 @@
   <h1>📌 نظام الحضور والانصراف</h1>
 
   <div style="text-align:center;">
-    <label>💰 المرتب الشهري: <input type="number" id="monthlySalary" value="6000"></label><br><br>
+    <label>💰 المرتب الشهري: <input type="number" id="monthlySalary"></label><br><br>
     <button onclick="checkIn()">تسجيل دخول</button>
     <button onclick="checkOut()">تسجيل خروج</button>
     <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
@@ -92,8 +93,9 @@ function register() {
   let phone = document.getElementById("regPhone").value;
   let email = document.getElementById("regEmail").value;
   let password = document.getElementById("regPassword").value;
+  let salary = document.getElementById("regSalary").value;
 
-  users.push({name, phone, email, password});
+  users.push({name, phone, email, password, salary});
   localStorage.setItem("users", JSON.stringify(users));
   alert("✅ تم إنشاء الحساب بنجاح!");
   document.getElementById("registerScreen").style.display = "none";
@@ -116,6 +118,7 @@ function login() {
     currentUser = user;
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("mainApp").style.display = "block";
+    document.getElementById("monthlySalary").value = user.salary || 6000;
   } else {
     alert("❌ بيانات الدخول غير صحيحة!");
   }
