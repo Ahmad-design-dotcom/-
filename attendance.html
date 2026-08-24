@@ -90,6 +90,30 @@
       color: #667eea;
     }
 
+    /* بطاقة حالة اليوم الثابتة */
+    .today-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .today-item-label {
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .today-item-value {
+      font-weight: 700;
+      color: #333;
+    }
+
     .status-card {
       background: rgba(255, 255, 255, 0.95);
       padding: 16px;
@@ -177,6 +201,14 @@
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      filter: grayscale(0.6);
     }
 
     .btn-success {
@@ -382,6 +414,11 @@
         font-size: 28px;
       }
 
+      .today-card {
+        font-size: 12px;
+        padding: 12px;
+      }
+
       .whatsapp-btn {
         width: 55px;
         height: 55px;
@@ -458,14 +495,29 @@
       <div class="salary-value"><span id="userSalary"></span> جنيه</div>
     </div>
 
+    <div class="today-card">
+      <div>
+        <div class="today-item-label">حضور اليوم</div>
+        <div class="today-item-value" id="todayIn">—</div>
+      </div>
+      <div>
+        <div class="today-item-label">انصراف اليوم</div>
+        <div class="today-item-value" id="todayOut">—</div>
+      </div>
+      <div>
+        <div class="today-item-label">الحالة</div>
+        <div class="today-item-value" id="todayState">لم يتم التسجيل</div>
+      </div>
+    </div>
+
     <div id="statusCard" class="status-card">
       <div class="status-text" id="statusText"></div>
       <div class="status-time" id="statusTime"></div>
     </div>
 
     <div class="buttons-container">
-      <button class="btn btn-success" onclick="checkIn()">✅ حضور</button>
-      <button class="btn btn-danger" onclick="checkOut()">⛔ انصراف</button>
+      <button class="btn btn-success" id="btnCheckIn" onclick="checkIn()">✅ حضور</button>
+      <button class="btn btn-danger" id="btnCheckOut" onclick="checkOut()">⛔ انصراف</button>
       <button class="btn btn-info" onclick="addLeave('مدفوعة')">🎉 إجازة مدفوعة</button>
       <button class="btn btn-warning" onclick="addLeave('غير مدفوعة')">📅 إجازة بدون راتب</button>
     </div>
@@ -516,171 +568,294 @@
   <div class="whatsapp-tooltip">تواصل معنا</div>
 
 <script>
-// ✅ النظام الجديد: تسجيل فوري بدون انتظار
-let currentUser = null;
-let records = JSON.parse(localStorage.getItem("attendance")) || [];
-let dailyRecords = {}; // لتسجيل الحضور والانصراف لكل يوم
+/* =========================================================
+   نظام الحضور والانصراف - نسخة مُصححة
+   أهم إصلاح: حفظ dailyRecords في localStorage حتى لا تُفقد
+   حالة الحضور عند الخروج من الصفحة والرجوع إليها.
+   ========================================================= */
 
-// تحميل بيانات المستخدم
+let currentUser = null;
+let records = [];
+let dailyRecords = {};
+
+let RECORDS_KEY = "attendance";
+let DAILY_KEY = "dailyRecords";
+
+/* ---------- تحميل بيانات المستخدم ---------- */
 function loadCurrentUser() {
-  currentUser = JSON.parse(sessionStorage.getItem("loggedUser"));
-  
+  currentUser = safeParse(sessionStorage.getItem("loggedUser"));
+
   if (!currentUser) {
-    currentUser = JSON.parse(localStorage.getItem("loggedUser"));
+    currentUser = safeParse(localStorage.getItem("loggedUser"));
   }
-  
-  if (currentUser) {
-    sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
-    localStorage.setItem("loggedUser", JSON.stringify(currentUser));
-  } else {
+
+  if (!currentUser) {
     alert("⚠️ لم يتم العثور على بيانات المستخدم، برجاء تسجيل الدخول أولًا!");
     window.location.href = "login.html";
     return false;
   }
+
+  sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
+  localStorage.setItem("loggedUser", JSON.stringify(currentUser));
+
+  // فصل بيانات كل مستخدم عن الآخر حتى لا تتداخل السجلات
+  const userId = String(currentUser.id || currentUser.username || currentUser.phone || currentUser.name || "default");
+  RECORDS_KEY = "attendance_" + userId;
+  DAILY_KEY = "dailyRecords_" + userId;
+
   return true;
+}
+
+function safeParse(value) {
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 if (!loadCurrentUser()) {
   throw new Error("لم يتم تحميل بيانات المستخدم");
 }
 
-document.getElementById("userSalary").innerText = currentUser.salary;
+/* عدد ساعات العمل اليومية وقيمة الساعة - مع قيم افتراضية لتجنب NaN */
+const monthlySalary = parseFloat(currentUser.salary) || 0;
+const dailyHours = parseFloat(currentUser.hours) || 8;
+const hourRate = monthlySalary / 30 / dailyHours;
 
-// تحديث التحية والوقت
-function updateHeader() {
-  let now = new Date();
-  let days = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
-  let greeting = now.getHours() < 12 ? "☀️ صباح الخير" : (now.getHours() < 17 ? "🌤️ بعد الظهر" : "🌙 مساء الخير");
-  document.getElementById("greeting").innerText = greeting + " يا " + currentUser.name;
-  document.getElementById("dateTime").innerText =
-    `${days[now.getDay()]} - ${now.toLocaleDateString("ar-EG")} - ${now.toLocaleTimeString("ar-EG")}`;
+document.getElementById("userSalary").innerText = monthlySalary;
+
+/* ---------- مفاتيح التاريخ ---------- */
+// مفتاح ثابت (YYYY-MM-DD) لا يتأثر باللغة أو الأرقام العربية
+function getTodayKey(date) {
+  const d = date || new Date();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return d.getFullYear() + "-" + month + "-" + day;
 }
-updateHeader();
-setInterval(updateHeader, 60000);
 
+// النص المعروض للمستخدم
+function getTodayLabel(date) {
+  return (date || new Date()).toLocaleDateString("ar-EG");
+}
+
+/* ---------- التخزين ---------- */
 function saveData() {
-  localStorage.setItem("attendance", JSON.stringify(records));
-  sessionStorage.setItem("attendance", JSON.stringify(records));
+  localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+  localStorage.setItem(DAILY_KEY, JSON.stringify(dailyRecords));
 }
 
-function getTodayKey() {
-  return new Date().toLocaleDateString("ar-EG");
+function loadData() {
+  records = safeParse(localStorage.getItem(RECORDS_KEY)) || [];
+  dailyRecords = safeParse(localStorage.getItem(DAILY_KEY)) || {};
+
+  // ترحيل البيانات القديمة المحفوظة تحت المفتاح العام
+  if (records.length === 0) {
+    const legacy = safeParse(localStorage.getItem("attendance"));
+    if (legacy && legacy.length) {
+      records = legacy;
+    }
+  }
+
+  rebuildDailyRecords();
+  saveData();
 }
+
+// إعادة بناء حالة كل يوم من الجدول نفسه (شبكة أمان للبيانات القديمة)
+function rebuildDailyRecords() {
+  records.forEach(r => {
+    if (r.type !== "عمل") return;
+
+    if (!r.dateKey) {
+      // السجلات القديمة لا تحتوى مفتاح ثابت، نستنتجه من نص التاريخ إن كان اليوم
+      r.dateKey = r.date === getTodayLabel() ? getTodayKey() : "legacy-" + r.date;
+    }
+
+    const key = r.dateKey;
+    if (!dailyRecords[key]) dailyRecords[key] = {};
+
+    if (r.in && r.in !== "-" && !dailyRecords[key].checkIn) {
+      dailyRecords[key].checkIn = { time: r.in, timestamp: r.inTs || null };
+    }
+    if (r.out && r.out !== "-" && !dailyRecords[key].checkOut) {
+      dailyRecords[key].checkOut = {
+        time: r.out,
+        timestamp: r.outTs || null,
+        hours: r.hours,
+        salary: r.value
+      };
+    }
+  });
+}
+
+/* ---------- الهيدر ---------- */
+function updateHeader() {
+  const now = new Date();
+  const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+  const greeting = now.getHours() < 12 ? "☀️ صباح الخير" : (now.getHours() < 17 ? "🌤️ بعد الظهر" : "🌙 مساء الخير");
+  document.getElementById("greeting").innerText = greeting + " يا " + (currentUser.name || "");
+  document.getElementById("dateTime").innerText =
+    days[now.getDay()] + " - " + now.toLocaleDateString("ar-EG") + " - " + now.toLocaleTimeString("ar-EG");
+}
+
+/* ---------- رسائل الحالة ---------- */
+let statusTimer = null;
 
 function showStatus(message, type) {
   const statusCard = document.getElementById("statusCard");
-  const statusText = document.getElementById("statusText");
-  const statusTime = document.getElementById("statusTime");
-  
-  statusText.textContent = message;
-  statusTime.textContent = new Date().toLocaleTimeString("ar-EG");
+  document.getElementById("statusText").textContent = message;
+  document.getElementById("statusTime").textContent = new Date().toLocaleTimeString("ar-EG");
   statusCard.className = "status-card show " + type;
-  
-  setTimeout(() => {
+
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => {
     statusCard.classList.remove("show");
   }, 4000);
 }
 
+// عرض حالة اليوم الحالى بعد أى إعادة تحميل للصفحة
+function updateTodayCard() {
+  const today = dailyRecords[getTodayKey()] || {};
+  const inEl = document.getElementById("todayIn");
+  const outEl = document.getElementById("todayOut");
+  const stateEl = document.getElementById("todayState");
+
+  inEl.textContent = today.checkIn ? today.checkIn.time : "—";
+  outEl.textContent = today.checkOut ? today.checkOut.time : "—";
+
+  if (today.checkOut) {
+    stateEl.textContent = "انتهى الدوام";
+  } else if (today.checkIn) {
+    stateEl.textContent = "داخل العمل";
+  } else {
+    stateEl.textContent = "لم يتم التسجيل";
+  }
+
+  document.getElementById("btnCheckIn").disabled = !!today.checkIn;
+  document.getElementById("btnCheckOut").disabled = !today.checkIn || !!today.checkOut;
+}
+
+/* ---------- تسجيل الحضور ---------- */
 function checkIn() {
-  const today = getTodayKey();
+  const key = getTodayKey();
   const now = new Date();
   const timeStr = now.toLocaleTimeString("ar-EG");
-  
-  // تحقق إذا كان هناك تسجيل حضور اليوم بالفعل
-  if (dailyRecords[today] && dailyRecords[today].checkIn) {
-    alert("❌ لقد سجلت حضورك اليوم بالفعل!\nالوقت: " + dailyRecords[today].checkIn.time);
+
+  if (dailyRecords[key] && dailyRecords[key].checkIn) {
+    alert("❌ لقد سجلت حضورك اليوم بالفعل!\nالوقت: " + dailyRecords[key].checkIn.time);
     return;
   }
-  
-  // إذا لم يكن هناك سجل لليوم، أنشئ واحد جديد
-  if (!dailyRecords[today]) {
-    dailyRecords[today] = {};
-  }
-  
-  // سجل وقت الحضور
-  dailyRecords[today].checkIn = {
-    time: timeStr,
-    timestamp: now.getTime()
-  };
-  
-  // أضف سجل مؤقت في الجدول
+
+  if (!dailyRecords[key]) dailyRecords[key] = {};
+
+  dailyRecords[key].checkIn = { time: timeStr, timestamp: now.getTime() };
+
   records.push({
-    date: today,
+    dateKey: key,
+    date: getTodayLabel(now),
     in: timeStr,
+    inTs: now.getTime(),
     out: "-",
+    outTs: null,
     hours: "-",
     value: "-",
     type: "عمل",
     loan: "",
     deduction: ""
   });
-  
+
   saveData();
   renderTable();
+  updateTodayCard();
   showStatus("✅ تم تسجيل الحضور بنجاح", "checked-in");
-  alert("✅ حضور: " + timeStr);
 }
 
+/* ---------- تسجيل الانصراف ---------- */
 function checkOut() {
-  const today = getTodayKey();
+  const key = getTodayKey();
   const now = new Date();
   const timeStr = now.toLocaleTimeString("ar-EG");
-  
-  // تحقق من وجود حضور لليوم
-  if (!dailyRecords[today] || !dailyRecords[today].checkIn) {
+
+  if (!dailyRecords[key] || !dailyRecords[key].checkIn) {
     alert("❌ لم تسجل حضورك بعد! يجب تسجيل الحضور أولاً");
     return;
   }
-  
-  // تحقق إذا كان قد تم تسجيل انصراف بالفعل
-  if (dailyRecords[today].checkOut) {
-    alert("❌ لقد سجلت انصرافك بالفعل!\nالوقت: " + dailyRecords[today].checkOut.time);
+
+  if (dailyRecords[key].checkOut) {
+    alert("❌ لقد سجلت انصرافك بالفعل!\nالوقت: " + dailyRecords[key].checkOut.time);
     return;
   }
-  
-  // سجل وقت الانصراف
-  const checkInTime = dailyRecords[today].checkIn.timestamp;
-  const checkOutTime = now.getTime();
-  const hoursWorked = (checkOutTime - checkInTime) / (1000 * 60 * 60);
-  
-  // حساب قيمة اليوم
-  const hourRate = currentUser.salary / 30 / currentUser.hours;
+
+  // البحث عن سجل الحضور المفتوح لنفس اليوم بدل الاعتماد على آخر سجل فى المصفوفة
+  const openRecord = records.find(r => r.dateKey === key && r.type === "عمل" && r.out === "-");
+
+  const checkInTs = dailyRecords[key].checkIn.timestamp || (openRecord && openRecord.inTs) || null;
+  let hoursWorked = 0;
+
+  if (checkInTs) {
+    hoursWorked = (now.getTime() - checkInTs) / (1000 * 60 * 60);
+  }
+  if (!isFinite(hoursWorked) || hoursWorked < 0) hoursWorked = 0;
+
+  const hoursText = hoursWorked.toFixed(2);
   const dailySalary = (hoursWorked * hourRate).toFixed(2);
-  
-  dailyRecords[today].checkOut = {
+
+  dailyRecords[key].checkOut = {
     time: timeStr,
-    timestamp: checkOutTime,
-    hours: hoursWorked.toFixed(2),
+    timestamp: now.getTime(),
+    hours: hoursText,
     salary: dailySalary
   };
-  
-  // حدث آخر سجل (الحضور) بالانصراف والحساب
-  let lastRecord = records[records.length - 1];
-  if (lastRecord && lastRecord.date === today && lastRecord.out === "-") {
-    lastRecord.out = timeStr;
-    lastRecord.hours = hoursWorked.toFixed(2);
-    lastRecord.value = dailySalary;
+
+  if (openRecord) {
+    openRecord.out = timeStr;
+    openRecord.outTs = now.getTime();
+    openRecord.hours = hoursText;
+    openRecord.value = dailySalary;
+  } else {
+    // لو لم يوجد سجل مفتوح (بيانات قديمة) ننشئ سجلاً مكتملاً
+    records.push({
+      dateKey: key,
+      date: getTodayLabel(now),
+      in: dailyRecords[key].checkIn.time,
+      inTs: checkInTs,
+      out: timeStr,
+      outTs: now.getTime(),
+      hours: hoursText,
+      value: dailySalary,
+      type: "عمل",
+      loan: "",
+      deduction: ""
+    });
   }
-  
+
   saveData();
   renderTable();
+  updateTodayCard();
   showStatus("✅ تم تسجيل الانصراف بنجاح", "checked-out");
-  alert("✅ انصراف: " + timeStr + "\n⏰ ساعات العمل: " + hoursWorked.toFixed(2) + "\n💰 قيمة اليوم: " + dailySalary + " جنيه");
+  alert("✅ انصراف: " + timeStr + "\n⏰ ساعات العمل: " + hoursText + "\n💰 قيمة اليوم: " + dailySalary + " جنيه");
 }
 
+/* ---------- الإجازات ---------- */
 function addLeave(type) {
-  const today = getTodayKey();
-  
-  // تحقق إذا كان هناك سجل عمل اليوم
-  if (dailyRecords[today] && (dailyRecords[today].checkIn || dailyRecords[today].checkOut)) {
+  const key = getTodayKey();
+
+  if (dailyRecords[key] && (dailyRecords[key].checkIn || dailyRecords[key].checkOut)) {
     alert("❌ لا يمكن إضافة إجازة في يوم مسجل عمل!");
     return;
   }
-  
-  const leaveValue = type === "مدفوعة" ? currentUser.salary / 30 : 0;
-  
+
+  const alreadyLeave = records.some(r => r.dateKey === key && (r.type === "مدفوعة" || r.type === "غير مدفوعة"));
+  if (alreadyLeave) {
+    alert("❌ تم تسجيل إجازة لهذا اليوم بالفعل!");
+    return;
+  }
+
+  const leaveValue = type === "مدفوعة" ? monthlySalary / 30 : 0;
+
   records.push({
-    date: today,
+    dateKey: key,
+    date: getTodayLabel(),
     in: "-",
     out: "-",
     hours: "إجازة",
@@ -689,90 +864,110 @@ function addLeave(type) {
     loan: "",
     deduction: ""
   });
-  
+
   saveData();
   renderTable();
-  alert("✅ تم إضافة إجازة " + type);
+  showStatus("✅ تم إضافة إجازة " + type, "checked-in");
 }
 
+/* ---------- السُلف والخصومات ---------- */
 function addLoan() {
-  const loan = prompt("أدخل قيمة السُلفة:");
-  if (loan && loan > 0) {
-    records.push({
-      date: new Date().toLocaleDateString("ar-EG"),
-      in: "-",
-      out: "-",
-      hours: "-",
-      value: "-",
-      type: "سُلفة",
-      loan: loan,
-      deduction: ""
-    });
-    saveData();
-    renderTable();
-    alert("✅ تم إضافة سُلفة: " + loan + " جنيه");
+  const input = prompt("أدخل قيمة السُلفة:");
+  if (input === null) return;
+
+  const loan = parseFloat(input);
+  if (!isFinite(loan) || loan <= 0) {
+    alert("❌ من فضلك أدخل رقمًا صحيحًا أكبر من صفر");
+    return;
   }
+
+  records.push({
+    dateKey: getTodayKey(),
+    date: getTodayLabel(),
+    in: "-",
+    out: "-",
+    hours: "-",
+    value: "-",
+    type: "سُلفة",
+    loan: loan,
+    deduction: ""
+  });
+
+  saveData();
+  renderTable();
+  showStatus("✅ تم إضافة سُلفة: " + loan + " جنيه", "checked-in");
 }
 
 function addDeduction() {
-  const deduction = prompt("أدخل قيمة الخصم:");
-  if (deduction && deduction > 0) {
-    records.push({
-      date: new Date().toLocaleDateString("ar-EG"),
-      in: "-",
-      out: "-",
-      hours: "-",
-      value: "-",
-      type: "خصم",
-      loan: "",
-      deduction: deduction
-    });
-    saveData();
-    renderTable();
-    alert("✅ تم إضافة خصم: " + deduction + " جنيه");
+  const input = prompt("أدخل قيمة الخصم:");
+  if (input === null) return;
+
+  const deduction = parseFloat(input);
+  if (!isFinite(deduction) || deduction <= 0) {
+    alert("❌ من فضلك أدخل رقمًا صحيحًا أكبر من صفر");
+    return;
   }
+
+  records.push({
+    dateKey: getTodayKey(),
+    date: getTodayLabel(),
+    in: "-",
+    out: "-",
+    hours: "-",
+    value: "-",
+    type: "خصم",
+    loan: "",
+    deduction: deduction
+  });
+
+  saveData();
+  renderTable();
+  showStatus("✅ تم إضافة خصم: " + deduction + " جنيه", "checked-out");
 }
 
+/* ---------- إعادة الشهر وتسجيل الخروج ---------- */
 function resetMonth() {
-  if (confirm("⚠️ هل أنت متأكد أنك تريد إعادة تسجيل الشهر من جديد؟ سيتم مسح كل البيانات!")) {
-    records = [];
-    dailyRecords = {};
-    localStorage.removeItem("attendance");
-    sessionStorage.removeItem("attendance");
-    renderTable();
-    alert("✅ تم إعادة الشهر بنجاح!");
-  }
+  if (!confirm("⚠️ هل أنت متأكد أنك تريد إعادة تسجيل الشهر من جديد؟ سيتم مسح كل البيانات!")) return;
+
+  records = [];
+  dailyRecords = {};
+  localStorage.removeItem(RECORDS_KEY);
+  localStorage.removeItem(DAILY_KEY);
+  localStorage.removeItem("attendance");
+  sessionStorage.removeItem("attendance");
+
+  renderTable();
+  updateTodayCard();
+  alert("✅ تم إعادة الشهر بنجاح!");
 }
 
 function logout() {
-  if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-    localStorage.removeItem("loggedUser");
-    sessionStorage.removeItem("loggedUser");
-    alert("👋 تم تسجيل الخروج بنجاح!");
-    window.location.href = "login.html";
-  }
+  if (!confirm("هل أنت متأكد من تسجيل الخروج؟")) return;
+
+  // نحذف بيانات الدخول فقط - سجلات الحضور تبقى محفوظة
+  localStorage.removeItem("loggedUser");
+  sessionStorage.removeItem("loggedUser");
+  alert("👋 تم تسجيل الخروج بنجاح!");
+  window.location.href = "login.html";
 }
 
+/* ---------- الجدول والملخص ---------- */
 function renderTable() {
-  let table = document.getElementById("attendanceTable");
-  table.innerHTML = `<tr>
+  const table = document.getElementById("attendanceTable");
+  let html = `<tr>
     <th>التاريخ</th><th>الدخول</th><th>الخروج</th><th>الساعات</th><th>القيمة</th><th>النوع</th>
   </tr>`;
-  
+
   let total = 0;
   let loans = 0;
   let deductions = 0;
-  
+
   records.forEach(r => {
-    const value = parseFloat(r.value) || 0;
-    const loanVal = parseFloat(r.loan) || 0;
-    const deductVal = parseFloat(r.deduction) || 0;
-    
-    total += value;
-    loans += loanVal;
-    deductions += deductVal;
-    
-    table.innerHTML += `<tr>
+    total += parseFloat(r.value) || 0;
+    loans += parseFloat(r.loan) || 0;
+    deductions += parseFloat(r.deduction) || 0;
+
+    html += `<tr>
       <td>${r.date}</td>
       <td>${r.in}</td>
       <td>${r.out}</td>
@@ -781,18 +976,25 @@ function renderTable() {
       <td>${r.type}</td>
     </tr>`;
   });
-  
+
+  table.innerHTML = html;
+
   const finalTotal = total - loans - deductions;
-  
+
   document.getElementById("totalValue").innerHTML = finalTotal.toFixed(2) + " <small>جنيه</small>";
-  document.getElementById("summaryDetails").innerHTML = 
+  document.getElementById("summaryDetails").innerHTML =
     `الراتب المكتسب: ${total.toFixed(2)} جنيه<br>` +
     `السُلف: ${loans.toFixed(2)} جنيه<br>` +
     `الخصومات: ${deductions.toFixed(2)} جنيه<br>` +
     `<strong style="color: #2196f3;">الرصيد النهائي: ${finalTotal.toFixed(2)} جنيه</strong>`;
 }
 
+/* ---------- التشغيل ---------- */
+loadData();
+updateHeader();
+setInterval(updateHeader, 30000);
 renderTable();
+updateTodayCard();
 </script>
 </body>
 </html>
