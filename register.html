@@ -6,43 +6,24 @@
   <style>
     body {
       font-family: 'Tahoma', sans-serif;
-      direction: rtl;
-      text-align: center;
-      background: #f4f6f9;
-      margin: 0;
-      padding: 40px 10px;
+      direction: rtl; text-align: center;
+      background: linear-gradient(135deg, #4a148c, #2196f3);
+      color: #fff; margin: 0; padding: 40px 10px;
     }
-    h1 {
-      color: #4caf50;
-      font-size: 26px;
-      margin-bottom: 10px;
-    }
+    h1 { color: #fff; font-size: 26px; margin-bottom: 10px; }
     input {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 10px auto;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 15px;
+      display: block; width: 90%; max-width: 300px;
+      margin: 10px auto; padding: 10px;
+      border: none; border-radius: 8px; font-size: 15px;
     }
     button {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 15px auto;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #4caf50;
-      color: #fff;
-      transition: 0.3s;
+      display: block; width: 90%; max-width: 300px;
+      margin: 15px auto; padding: 12px;
+      font-size: 16px; border: none; border-radius: 8px;
+      cursor: pointer; background: #4caf50; color: #fff;
     }
     button:hover { opacity: 0.85; }
-    a { color: #2196f3; text-decoration: none; font-size: 14px; }
+    a { color: #fff; text-decoration: underline; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -60,7 +41,6 @@
 
 <script>
 let users = JSON.parse(localStorage.getItem("users")) || [];
-
 function register() {
   let user = {
     name: document.getElementById("regName").value,
