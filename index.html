@@ -9,12 +9,6 @@
     button { margin:5px; padding:10px 15px; border:none; border-radius:5px; cursor:pointer; font-size:14px; }
     button:hover { opacity:0.85; }
     input { margin:5px; padding:8px; border:1px solid #ccc; border-radius:5px; }
-    table { border-collapse: collapse; width:95%; margin:20px auto; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
-    th, td { border:1px solid #ccc; padding:10px; text-align:center; }
-    th { background:#eee; }
-    #summary { text-align:center; margin:20px; color:#333; }
-    footer { background:#222; color:#fff; text-align:center; padding:15px; margin-top:30px; font-size:14px; }
-    footer a { color:#4caf50; text-decoration:none; }
     #loginScreen, #registerScreen { text-align:center; padding:50px; }
     #mainApp { display:none; }
     #checkinBtn { background:#4caf50; color:#fff; }
@@ -54,47 +48,20 @@
   </div>
 
   <h1>📌 نظام الحضور والانصراف</h1>
+  <p style="text-align:center;">💰 مرتبك: <span id="userSalary"></span> جنيه</p>
 
   <div style="text-align:center;">
-    <p>💰 مرتبك: <span id="userSalary"></span> جنيه</p><br>
     <button id="checkinBtn" onclick="checkIn()">حضور</button>
     <button id="checkoutBtn" onclick="checkOut()">انصراف</button>
-    <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
-    <button onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
-    <button onclick="addLoan()">إضافة سُلفة</button>
-    <button onclick="addDeduction()">إضافة خصم</button>
-    <button onclick="resetMonth()">إعادة الشهر</button>
     <button id="logoutBtn" onclick="logout()">تسجيل الخروج من الحساب</button>
   </div>
-
-  <table id="attendanceTable">
-    <tr>
-      <th>التاريخ</th>
-      <th>وقت الدخول</th>
-      <th>وقت الخروج</th>
-      <th>عدد الساعات</th>
-      <th>قيمة اليوم</th>
-      <th>نوع الإجازة</th>
-      <th>السُلفة</th>
-      <th>الخصم</th>
-    </tr>
-  </table>
-
-  <h2 id="summary">ملخص المرتب الشهري: 0 جنيه</h2>
-
-  <footer>
-    👨‍💻 المطور: أحمد حاتم عبدالعظيم | 📞 <a href="tel:01102975929">01102975929</a> | ✉️ <a href="mailto:ahmadhatem973@gmail.com">ahmadhatem973@gmail.com</a>
-  </footer>
 </div>
 
 <script>
-let records = JSON.parse(localStorage.getItem("attendance")) || [];
 let users = JSON.parse(localStorage.getItem("users")) || [];
 let currentUser = null;
-let checkInTime = null;
-let paidLeaves = 0;
 
-// لو في جلسة محفوظة
+// عند تحميل الصفحة لو في جلسة محفوظة
 window.onload = function() {
   let savedUser = JSON.parse(localStorage.getItem("loggedUser"));
   if (savedUser) {
@@ -102,10 +69,6 @@ window.onload = function() {
     showMainApp();
   }
 };
-
-function saveData() {
-  localStorage.setItem("attendance", JSON.stringify(records));
-}
 
 // إنشاء حساب
 function register() {
@@ -118,6 +81,8 @@ function register() {
   users.push({name, phone, email, password, salary});
   localStorage.setItem("users", JSON.stringify(users));
   alert("✅ تم إنشاء الحساب بنجاح!");
+
+  // بعد الإنشاء يروح لشاشة تسجيل الدخول
   document.getElementById("registerScreen").style.display = "none";
   document.getElementById("loginScreen").style.display = "block";
 }
@@ -144,7 +109,7 @@ function login() {
   }
 }
 
-// تسجيل خروج من الحساب
+// تسجيل خروج
 function logout() {
   currentUser = null;
   localStorage.removeItem("loggedUser");
@@ -152,10 +117,10 @@ function logout() {
   document.getElementById("loginScreen").style.display = "block";
 }
 
-// عرض التطبيق الرئيسي مع التحية والتاريخ
+// عرض التطبيق الرئيسي
 function showMainApp() {
-  document.getElementById("loginScreen").style.display = "none";
   document.getElementById("registerScreen").style.display = "none";
+  document.getElementById("loginScreen").style.display = "none";
   document.getElementById("mainApp").style.display = "block";
   document.getElementById("userSalary").innerText = currentUser.salary || 0;
 
@@ -165,3 +130,22 @@ function showMainApp() {
   document.getElementById("greeting").innerText = greeting + currentUser.name;
 
   let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit' };
+  document.getElementById("dateTime").innerText = now.toLocaleDateString("ar-EG", options);
+}
+
+// حضور
+function checkIn() {
+  if (confirm("هل تريد تسجيل حضور الآن؟")) {
+    alert("✅ تم تسجيل الحضور");
+  }
+}
+
+// انصراف
+function checkOut() {
+  if (confirm("هل تريد تسجيل انصراف الآن؟")) {
+    alert("✅ تم تسجيل الانصراف");
+  }
+}
+</script>
+</body>
+</html>
