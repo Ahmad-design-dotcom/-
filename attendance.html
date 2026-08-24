@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>الحضور والانصراف</title>
+</head>
+<body>
+  <div id="headerBar">
+    <span id="greeting"></span>
+    <span id="dateTime"></span>
+  </div>
+
+  <h1>📌 نظام الحضور والانصراف</h1>
+  <p>💰 مرتبك: <span id="userSalary"></span> جنيه</p>
+
+  <button id="checkinBtn" onclick="checkIn()">حضور</button>
+  <button id="checkoutBtn" onclick="checkOut()">انصراف</button>
+  <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
+  <button onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
+  <button onclick="addLoan()">إضافة سُلفة</button>
+  <button onclick="addDeduction()">إضافة خصم</button>
+  <button onclick="logout()">تسجيل الخروج من الحساب</button>
+
+  <table id="attendanceTable" border="1" style="margin-top:20px;">
+    <tr>
+      <th>التاريخ</th>
+      <th>وقت الدخول</th>
+      <th>وقت الخروج</th>
+      <th>عدد الساعات</th>
+      <th>قيمة اليوم</th>
+      <th>نوع الإجازة</th>
+      <th>السُلفة</th>
+      <th>الخصم</th>
+    </tr>
+  </table>
+
+<script>
+let currentUser = JSON.parse(localStorage.getItem("loggedUser"));
+let records = JSON.parse(localStorage.getItem("attendance")) || [];
+let checkInTime = null;
+let paidLeaves = 0;
+
+if (!currentUser) {
+  window.location.href = "login.html";
+}
+
+document.getElementById("userSalary").innerText = currentUser.salary;
+let now = new Date();
+let greeting = now.getHours() < 12 ? "☀️ صباح الخير " : "🌙 مساء الخير ";
+document.getElementById("greeting").innerText = greeting + currentUser.name;
+document.getElementById("dateTime").innerText = now.toLocaleString("ar-EG");
+
+function saveData() {
+  localStorage.setItem("attendance", JSON.stringify(records));
+}
+
+function checkIn() {
+  if (confirm("هل تريد تسجيل حضور الآن؟")) {
+    checkInTime = new Date();
+    alert("✅ تم تسجيل الحضور: " + checkInTime.toLocaleTimeString("ar-EG"));
+  }
+}
+
+function checkOut() {
+  if (!checkInTime) { alert("لازم تسجل حضور الأول"); return; }
+  if (confirm("هل تريد تسجيل انصراف الآن؟")) {
+    let checkOutTime = new Date();
+    let hoursWorked = (checkOutTime - checkInTime) / (1000*60*60);
+    let hourRate = currentUser.salary / 30 / currentUser.hours;
+    let dailySalary = (hoursWorked * hourRate).toFixed(2);
+
+    records.push({
+      date: now.toLocaleDateString("ar-EG"),
+      in: checkInTime.toLocaleTimeString("ar-EG"),
+      out: checkOutTime.toLocaleTimeString("ar-EG"),
+      hours: hoursWorked.toFixed(2),
+      value: dailySalary,
+      leave: "",
+      loan: "",
+      deduction: ""
+    });
+    saveData();
+    renderTable();
+    checkInTime = null;
+  }
+}
+
+function addLeave(type) {
+  if (type === "مدفوعة") {
+    if (paidLeaves >= 4) {
+      alert("❌ تم استنفاذ رصيد الإجازات المدفوعة لهذا الشهر!");
+      return;
+    }
+    paidLeaves++;
+    records.push({date: now.toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:(currentUser.salary/30).toFixed(2), leave:type, loan:"", deduction:""});
+  } else {
+    records.push({date: now.toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:type, loan:"", deduction:""});
+  }
+  saveData();
+  renderTable();
+}
+
+function addLoan() {
+  let loan = prompt("أدخل قيمة السُلفة:");
+  if (loan) {
+    records.push({date: now.toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:loan, deduction:""});
+    saveData();
+    renderTable();
+  }
+}
+
+function addDeduction() {
+  let deduction = prompt("أدخل قيمة الخصم:");
+  if (deduction) {
+    records.push({date: now.toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:"", deduction:deduction});
+    saveData();
+    renderTable();
+  }
+}
+
+function logout() {
+  localStorage.removeItem("loggedUser");
+  window.location.href = "login.html";
+}
+
+function renderTable() {
+  let table = document.getElementById("attendanceTable");
+  table.innerHTML = `<tr>
+      <th>التاريخ</th><th>وقت الدخول</th><th>وقت الخروج</th><th>عدد الساعات</th><th>قيمة اليوم</th><th>نوع الإجازة</th><th>السُلفة</th><th>الخصم</th>
+    </tr>`;
+  records.forEach(r => {
+    table.innerHTML += `<
