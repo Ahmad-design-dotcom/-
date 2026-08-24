@@ -1,3 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نظام الحضور والانصراف</title>
+  <style>
+    body { font-family: 'Tahoma', sans-serif; direction: rtl; text-align: right; background:#f4f6f9; margin:0; }
+    h1 { color:#4a148c; text-align:center; padding:20px; }
+    button { margin:5px; padding:10px 15px; border:none; border-radius:5px; cursor:pointer; font-size:14px; }
+    button:hover { opacity:0.85; }
+    input { margin:5px; padding:8px; border:1px solid #ccc; border-radius:5px; }
+    table { border-collapse: collapse; width:95%; margin:20px auto; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+    th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+    th { background:#eee; }
+    #summary { text-align:center; margin:20px; color:#333; }
+    footer { background:#222; color:#fff; text-align:center; padding:15px; margin-top:30px; font-size:14px; }
+    footer a { color:#4caf50; text-decoration:none; }
+    #loginScreen, #registerScreen { text-align:center; padding:50px; }
+    #mainApp { display:none; }
+    #checkinBtn { background:#4caf50; color:#fff; }
+    #checkoutBtn { background:#f44336; color:#fff; }
+    #logoutBtn { background:#607d8b; color:#fff; }
+    #headerBar { display:flex; justify-content:space-between; padding:10px 20px; background:#eee; font-weight:bold; }
+  </style>
+</head>
+<body>
+
+<!-- شاشة إنشاء حساب -->
+<div id="registerScreen">
+  <h1>📝 إنشاء حساب جديد</h1>
+  <input type="text" id="regName" placeholder="الاسم الكامل"><br>
+  <input type="text" id="regPhone" placeholder="رقم الهاتف"><br>
+  <input type="email" id="regEmail" placeholder="البريد الإلكتروني"><br>
+  <input type="password" id="regPassword" placeholder="كلمة السر"><br>
+  <input type="number" id="regSalary" placeholder="المرتب الشهري"><br><br>
+  <button onclick="register()">إنشاء الحساب</button><br><br>
+  <button onclick="goToLogin()">لدي حساب بالفعل</button>
+</div>
+
+<!-- شاشة تسجيل دخول -->
+<div id="loginScreen" style="display:none;">
+  <h1>🔐 تسجيل دخول</h1>
+  <input type="text" id="loginName" placeholder="الاسم"><br>
+  <input type="password" id="loginPassword" placeholder="كلمة السر"><br>
+  <label><input type="checkbox" id="rememberMe"> حفظ تسجيل الدخول</label><br><br>
+  <button onclick="login()">دخول</button>
+</div>
+
+<!-- التطبيق الرئيسي -->
+<div id="mainApp">
+  <div id="headerBar">
+    <span id="greeting"></span>
+    <span id="dateTime"></span>
+  </div>
+
+  <h1>📌 نظام الحضور والانصراف</h1>
+
+  <div style="text-align:center;">
+    <p>💰 مرتبك: <span id="userSalary"></span> جنيه</p><br>
+    <button id="checkinBtn" onclick="checkIn()">حضور</button>
+    <button id="checkoutBtn" onclick="checkOut()">انصراف</button>
+    <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
+    <button onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
+    <button onclick="addLoan()">إضافة سُلفة</button>
+    <button onclick="addDeduction()">إضافة خصم</button>
+    <button onclick="resetMonth()">إعادة الشهر</button>
+    <button id="logoutBtn" onclick="logout()">تسجيل الخروج من الحساب</button>
+  </div>
+
+  <table id="attendanceTable">
+    <tr>
+      <th>التاريخ</th>
+      <th>وقت الدخول</th>
+      <th>وقت الخروج</th>
+      <th>عدد الساعات</th>
+      <th>قيمة اليوم</th>
+      <th>نوع الإجازة</th>
+      <th>السُلفة</th>
+      <th>الخصم</th>
+    </tr>
+  </table>
+
+  <h2 id="summary">ملخص المرتب الشهري: 0 جنيه</h2>
+
+  <footer>
+    👨‍💻 المطور: أحمد حاتم عبدالعظيم | 📞 <a href="tel:01102975929">01102975929</a> | ✉️ <a href="mailto:ahmadhatem973@gmail.com">ahmadhatem973@gmail.com</a>
+  </footer>
+</div>
+
 <script>
 let records = JSON.parse(localStorage.getItem("attendance")) || [];
 let users = JSON.parse(localStorage.getItem("users")) || [];
@@ -29,8 +118,6 @@ function register() {
   users.push({name, phone, email, password, salary});
   localStorage.setItem("users", JSON.stringify(users));
   alert("✅ تم إنشاء الحساب بنجاح!");
-
-  // بعد الإنشاء يدخل مباشرة على شاشة تسجيل الدخول
   document.getElementById("registerScreen").style.display = "none";
   document.getElementById("loginScreen").style.display = "block";
 }
@@ -78,42 +165,3 @@ function showMainApp() {
   document.getElementById("greeting").innerText = greeting + currentUser.name;
 
   let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit' };
-  document.getElementById("dateTime").innerText = now.toLocaleDateString("ar-EG", options);
-}
-
-// حضور
-function checkIn() {
-  if (confirm("هل تريد تسجيل حضور الآن؟")) {
-    checkInTime = new Date();
-    alert("✅ تم تسجيل الحضور: " + checkInTime.toLocaleString("ar-EG"));
-  }
-}
-
-// انصراف
-function checkOut() {
-  if (!checkInTime) { alert("لازم تسجل حضور الأول"); return; }
-  if (confirm("هل تريد تسجيل انصراف الآن؟")) {
-    let checkOutTime = new Date();
-    let hours = (checkOutTime - checkInTime) / (1000*60*60);
-
-    let salary = currentUser.salary || 0;
-    let hourRate = (salary / 30 / 12).toFixed(2);
-    let dailySalary = (hours * hourRate).toFixed(2);
-
-    records.push({
-      date: new Date().toLocaleDateString("ar-EG"),
-      in: checkInTime.toLocaleTimeString("ar-EG"),
-      out: checkOutTime.toLocaleTimeString("ar-EG"),
-      hours: hours.toFixed(2),
-      value: dailySalary,
-      leave: "",
-      loan: "",
-      deduction: ""
-    });
-
-    checkInTime = null;
-    renderTable();
-    saveData();
-  }
-}
-</script>
