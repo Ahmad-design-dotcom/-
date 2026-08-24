@@ -3,15 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>تسجيل دخول</title>
+  <style>
+    body {
+      font-family: 'Tahoma', sans-serif;
+      direction: rtl;
+      text-align: center;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 40px 10px;
+    }
+    h1 {
+      color: #2196f3;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    input {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    button {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 15px auto;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #2196f3;
+      color: #fff;
+      transition: 0.3s;
+    }
+    button:hover { opacity: 0.85; }
+    a { color: #4a148c; text-decoration: none; font-size: 14px; }
+  </style>
 </head>
 <body>
   <h1>🔐 تسجيل دخول</h1>
   <form onsubmit="login(); return false;">
-    <input type="text" id="loginName" placeholder="الاسم" required><br>
-    <input type="password" id="loginPassword" placeholder="كلمة السر" required><br>
-    <label><input type="checkbox" id="rememberMe"> حفظ تسجيل الدخول</label><br><br>
+    <input type="text" id="loginName" placeholder="الاسم" required>
+    <input type="password" id="loginPassword" placeholder="كلمة السر" required>
+    <label><input type="checkbox" id="rememberMe"> حفظ تسجيل الدخول</label>
     <button type="submit">دخول</button>
   </form>
+  <a href="register.html">ليس لديك حساب؟ أنشئ حساب جديد</a>
 
 <script>
 let users = JSON.parse(localStorage.getItem("users")) || [];
