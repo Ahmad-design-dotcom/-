@@ -2,22 +2,355 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>نظام الحضور والانصراف</title>
   <style>
-    body { font-family: 'Tahoma'; text-align:center; background:linear-gradient(135deg,#4a148c,#2196f3); color:#fff; margin:0; padding:40px 10px; }
-    h1 { font-size:26px; margin-bottom:10px; }
-    p { font-size:16px; margin-bottom:25px; }
-    .btn { display:block; width:90%; max-width:300px; margin:10px auto; padding:12px; font-size:16px; border:none; border-radius:8px; cursor:pointer; }
-    .btn-register { background:#4caf50; color:#fff; }
-    .btn-login { background:#2196f3; color:#fff; }
-    .btn-attendance { background:#9c27b0; color:#fff; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 20px;
+      padding: 40px 25px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .header-icon {
+      font-size: 56px;
+      margin-bottom: 15px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #333;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #999;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .buttons-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 55px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-register {
+      background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+      color: #fff;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #2196f3 0%, #0b7dda 100%);
+      color: #fff;
+    }
+
+    .btn-attendance {
+      background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+      color: #fff;
+    }
+
+    .btn-icon {
+      font-size: 22px;
+    }
+
+    .btn-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+
+    .btn-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .btn-description {
+      font-size: 12px;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .features {
+      background: #f5f5f5;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    .features-title {
+      color: #333;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .features-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .feature-item {
+      background: #fff;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      border: 2px solid #e0e0e0;
+      transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .feature-text {
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .footer-text {
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+
+    .footer-contact {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .footer-contact:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .card {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .header-icon {
+        font-size: 48px;
+      }
+
+      .btn {
+        padding: 14px;
+        font-size: 15px;
+        min-height: 50px;
+      }
+
+      .features-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .card {
+        padding: 25px 15px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .header-icon {
+        font-size: 42px;
+      }
+
+      .btn {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 48px;
+        gap: 10px;
+      }
+
+      .btn-text {
+        flex-direction: row;
+        gap: 5px;
+        align-items: center;
+      }
+
+      .btn-title {
+        font-size: 14px;
+      }
+
+      .btn-description {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>👋 مرحبًا بك في نظام الحضور والانصراف</h1>
-  <p>اختر الصفحة التي تريد الدخول إليها:</p>
-  <button class="btn btn-register" onclick="window.location.href='register.html'">إنشاء حساب جديد</button>
-  <button class="btn btn-login" onclick="window.location.href='login.html'">تسجيل دخول</button>
-  <button class="btn btn-attendance" onclick="window.location.href='attendance.html'">صفحة الحضور والانصراف</button>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="header-icon">👋</div>
+        <h1>مرحباً بك!</h1>
+        <p class="subtitle">نظام الحضور والانصراف الاحترافي<br>لإدارة وقتك وراتبك بكفاءة</p>
+      </div>
+
+      <div class="buttons-container">
+        <button class="btn btn-register" onclick="window.location.href='register.html'">
+          <span class="btn-icon">📝</span>
+          <span class="btn-text">
+            <span class="btn-title">إنشاء حساب جديد</span>
+            <span class="btn-description">ابدأ رحلتك الآن</span>
+          </span>
+        </button>
+
+        <button class="btn btn-login" onclick="window.location.href='login.html'">
+          <span class="btn-icon">🔐</span>
+          <span class="btn-text">
+            <span class="btn-title">تسجيل دخول</span>
+            <span class="btn-description">لديك حساب بالفعل؟</span>
+          </span>
+        </button>
+
+        <button class="btn btn-attendance" onclick="goToAttendance()">
+          <span class="btn-icon">📌</span>
+          <span class="btn-text">
+            <span class="btn-title">الحضور والانصراف</span>
+            <span class="btn-description">سجل حضورك الآن</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="features">
+        <div class="features-title">✨ المميزات الرئيسية</div>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-icon">⏰</div>
+            <div class="feature-text">تسجيل الحضور والانصراف</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">💰</div>
+            <div class="feature-text">حساب الراتب الشهري</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📅</div>
+            <div class="feature-text">إدارة الإجازات</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">💳</div>
+            <div class="feature-text">السُلف والخصومات</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text">تقارير تفصيلية</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📱</div>
+            <div class="feature-text">متوافق مع الهاتف</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="footer-text">تم التطوير بواسطة: <strong>أحمد حاتم عبد العظيم</strong></div>
+        <div class="footer-text">
+          📞 01102975929 – 
+          <a href="mailto:ahmadhatem973@gmail.com" class="footer-contact">✉️ ahmadhatem973@gmail.com</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function goToAttendance() {
+      let currentUser = JSON.parse(localStorage.getItem("loggedUser"));
+      if (currentUser) {
+        window.location.href = "attendance.html";
+      } else {
+        alert("⚠️ يرجى تسجيل الدخول أولاً للوصول إلى صفحة الحضور والانصراف");
+        window.location.href = "login.html";
+      }
+    }
+  </script>
 </body>
 </html>
