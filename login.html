@@ -23,7 +23,7 @@
 
     .container {
       width: 100%;
-      max-width: 450px;
+      max-width: 500px;
     }
 
     .card {
@@ -36,29 +36,41 @@
 
     .header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 35px;
     }
 
     .header-icon {
-      font-size: 48px;
-      margin-bottom: 10px;
+      font-size: 56px;
+      margin-bottom: 15px;
+      animation: slideDown 0.6s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 32px;
       color: #333;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-weight: 700;
     }
 
     .subtitle {
       color: #999;
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 15px;
+      line-height: 1.6;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     label {
@@ -66,7 +78,8 @@
       color: #555;
       font-size: 14px;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
     }
 
     .input-wrapper {
@@ -110,30 +123,58 @@
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
+      width: 35px;
+      height: 35px;
     }
 
     .password-toggle:hover {
       color: #764ba2;
-      transform: scale(1.1);
+      transform: scale(1.15);
     }
 
-    input[type="password"] {
+    input[type="password"],
+    .password-group input {
       padding-left: 45px;
     }
 
-    .form-group.password-group input {
-      padding-left: 45px;
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .remember-me input[type="checkbox"] {
+      width: auto;
+      min-width: 18px;
+      padding: 0;
+      border: 2px solid #e0e0e0;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .remember-me input[type="checkbox"]:checked {
+      border-color: #667eea;
+      background: #667eea;
+    }
+
+    .remember-me label {
+      margin: 0;
+      font-weight: 400;
+      cursor: pointer;
     }
 
     .button-group {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 12px;
+      gap: 14px;
       margin-top: 30px;
     }
 
     .btn {
-      padding: 14px;
+      padding: 16px;
       font-size: 16px;
       font-weight: 600;
       border: none;
@@ -144,8 +185,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      min-height: 50px;
+      gap: 10px;
+      min-height: 55px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     }
 
     .btn:active {
@@ -153,38 +195,72 @@
     }
 
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     }
 
     .btn-login {
       background: linear-gradient(135deg, #2196f3 0%, #0b7dda 100%);
       color: #fff;
-      box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
     }
 
     .btn-home {
       background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
       color: #fff;
-      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    .btn-icon {
+      font-size: 20px;
+    }
+
+    .alert {
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+      font-size: 14px;
+      display: none;
+      animation: slideDown 0.3s ease;
+      border-left: 4px solid;
+    }
+
+    .alert.error {
+      background: #ffebee;
+      color: #c62828;
+      border-left-color: #f44336;
+    }
+
+    .alert.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left-color: #4caf50;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .input-error {
+      border-color: #f44336 !important;
+      background: #fff5f5 !important;
     }
 
     .link-section {
       text-align: center;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
+      margin-top: 25px;
+      padding-top: 22px;
+      border-top: 2px solid #e0e0e0;
     }
 
     .link-text {
       color: #666;
       font-size: 14px;
+      line-height: 1.6;
     }
 
     .link-text a {
       color: #667eea;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
       transition: all 0.3s ease;
     }
 
@@ -193,96 +269,156 @@
       text-decoration: underline;
     }
 
-    .alert {
-      padding: 12px 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      font-size: 14px;
+    .loading-spinner {
       display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
 
-    .alert.error {
-      background: #ffebee;
-      color: #c62828;
-      border: 1px solid #ef5350;
-      display: block;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    .alert.success {
-      background: #e8f5e9;
-      color: #2e7d32;
-      border: 1px solid #4caf50;
-      display: block;
-    }
-
-    .input-error {
-      border-color: #f44336 !important;
-    }
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 15px 0;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .remember-me input {
-      width: auto;
-      padding: 0;
-      border: none;
-      cursor: pointer;
+    .btn:disabled {
+      opacity: 0.8;
+      cursor: not-allowed;
     }
 
     /* Responsive Design */
     @media (max-width: 480px) {
       .card {
         padding: 30px 20px;
+        border-radius: 18px;
       }
 
       h1 {
-        font-size: 24px;
+        font-size: 26px;
+        margin-bottom: 8px;
       }
 
       .header-icon {
-        font-size: 40px;
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      .subtitle {
+        font-size: 14px;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        font-size: 13px;
+        margin-bottom: 8px;
       }
 
       input {
         padding: 12px 14px;
         font-size: 14px;
+        border-radius: 10px;
+      }
+
+      .password-toggle {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+        left: 12px;
+      }
+
+      input[type="password"],
+      .password-group input {
+        padding-left: 42px;
       }
 
       .btn {
-        padding: 12px;
+        padding: 14px;
         font-size: 15px;
-        min-height: 45px;
+        min-height: 50px;
+        border-radius: 10px;
+        gap: 8px;
+      }
+
+      .btn-icon {
+        font-size: 18px;
+      }
+
+      .remember-me {
+        margin: 15px 0;
+        font-size: 13px;
+      }
+
+      .alert {
+        padding: 12px 14px;
+        font-size: 13px;
+        margin-bottom: 18px;
+        border-radius: 10px;
+      }
+
+      .link-section {
+        margin-top: 20px;
+        padding-top: 18px;
+      }
+
+      .link-text {
+        font-size: 13px;
       }
     }
 
     @media (max-width: 360px) {
+      .container {
+        max-width: 100%;
+      }
+
       .card {
         padding: 25px 15px;
+        border-radius: 16px;
+        margin: 10px;
       }
 
       h1 {
-        font-size: 20px;
+        font-size: 22px;
       }
 
       .header-icon {
-        font-size: 36px;
+        font-size: 40px;
+        margin-bottom: 10px;
       }
 
-      input {
-        padding: 10px 12px;
+      .subtitle {
         font-size: 13px;
       }
 
+      input {
+        padding: 11px 12px;
+        font-size: 13px;
+        border-radius: 9px;
+      }
+
       .btn {
-        padding: 10px;
+        padding: 12px;
         font-size: 14px;
-        min-height: 42px;
+        min-height: 46px;
+      }
+
+      .remember-me {
+        font-size: 12px;
+        gap: 8px;
+      }
+
+      .remember-me input[type="checkbox"] {
+        min-width: 16px;
+      }
+
+      .alert {
+        padding: 10px 12px;
+        font-size: 12px;
+        margin-bottom: 15px;
       }
     }
   </style>
@@ -292,8 +428,8 @@
     <div class="card">
       <div class="header">
         <div class="header-icon">🔐</div>
-        <h1>تسجيل دخول</h1>
-        <p class="subtitle">رحباً بعودتك! سجل دخولك للمتابعة</p>
+        <h1>تسجيل الدخول</h1>
+        <p class="subtitle">أهلاً بك مجدداً!<br>سجل دخولك لمتابعة عملك</p>
       </div>
 
       <div id="alertBox" class="alert"></div>
@@ -305,7 +441,7 @@
             <input 
               id="loginEmail" 
               type="text"
-              placeholder="أدخل بريدك الإلكتروني أو اسمك"
+              placeholder="ادخل بريدك أو اسمك"
               required
               autocomplete="email"
             >
@@ -313,16 +449,16 @@
         </div>
 
         <div class="form-group password-group">
-          <label for="loginPassword">🔑 كلمة السر</label>
+          <label for="loginPassword">🔑 كلمة المرور</label>
           <div class="input-wrapper">
             <input 
               id="loginPassword" 
               type="password"
-              placeholder="أدخل كلمة السر"
+              placeholder="ادخل كلمة المرور"
               required
               autocomplete="current-password"
             >
-            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')" title="اظهر/اخفي كلمة المرور">
               👁️
             </button>
           </div>
@@ -330,22 +466,25 @@
 
         <div class="remember-me">
           <input type="checkbox" id="rememberMe">
-          <label for="rememberMe" style="margin: 0; font-weight: normal;">تذكرني</label>
+          <label for="rememberMe">تذكر بيانات الدخول</label>
         </div>
 
         <div class="button-group">
-          <button type="submit" class="btn btn-login">
-            🚀 دخول
+          <button type="submit" class="btn btn-login" id="loginBtn">
+            <span class="btn-icon">🚀</span>
+            <span>دخول</span>
+            <div class="loading-spinner" id="spinner"></div>
           </button>
-          <button type="button" class="btn btn-home" onclick="window.location.href='index.html'">
-            🏠 الصفحة الرئيسية
+          <button type="button" class="btn btn-home" onclick="goHome()">
+            <span class="btn-icon">🏠</span>
+            <span>الصفحة الرئيسية</span>
           </button>
         </div>
       </form>
 
       <div class="link-section">
-        <p class="link-text">ليس لديك حساب؟ 
-          <a href="register.html">أنشئ حساب جديد</a>
+        <p class="link-text">ليس لديك حساب؟<br>
+          <a href="register.html">أنشئ حساب جديد الآن</a>
         </p>
       </div>
     </div>
@@ -361,48 +500,69 @@ function togglePassword(fieldId) {
 function showAlert(message, type) {
   const alertBox = document.getElementById('alertBox');
   alertBox.textContent = message;
-  alertBox.className = 'alert ' + type;
-  setTimeout(() => {
-    alertBox.className = 'alert';
-  }, 5000);
+  alertBox.className = 'alert ' + type + ' show';
+  
+  if (type === 'error') {
+    setTimeout(() => {
+      alertBox.classList.remove('show');
+    }, 5000);
+  }
+}
+
+function goHome() {
+  window.location.href = 'index.html';
 }
 
 function login() {
   const emailOrName = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   const rememberMe = document.getElementById('rememberMe').checked;
+  const loginBtn = document.getElementById('loginBtn');
+  const spinner = document.getElementById('spinner');
 
   if (!emailOrName || !password) {
     showAlert('❌ يرجى ملء جميع الحقول', 'error');
     return;
   }
 
-  let users = JSON.parse(localStorage.getItem("users")) || [];
-  
-  // البحث عن المستخدم باستخدام البريد أو الاسم
-  let user = users.find(u => 
-    (u.email === emailOrName || u.name === emailOrName) && u.password === password
-  );
+  // إظهار الـ spinner
+  loginBtn.disabled = true;
+  spinner.style.display = 'inline-block';
 
-  if (user) {
-    // حفظ بيانات المستخدم في localStorage
-    localStorage.setItem("loggedUser", JSON.stringify(user));
+  // تأخير صغير لمحاكاة التحميل
+  setTimeout(() => {
+    let users = JSON.parse(localStorage.getItem("users")) || [];
     
-    // إذا اختار "تذكرني" حفظ البيانات أيضاً
-    if (rememberMe) {
-      localStorage.setItem("rememberUser", JSON.stringify(user));
+    // البحث عن المستخدم باستخدام البريد أو الاسم
+    let user = users.find(u => 
+      (u.email === emailOrName || u.name === emailOrName) && u.password === password
+    );
+
+    if (user) {
+      // حفظ بيانات المستخدم في localStorage
+      localStorage.setItem("loggedUser", JSON.stringify(user));
+      
+      // إذا اختار "تذكرني" حفظ البيانات أيضاً
+      if (rememberMe) {
+        localStorage.setItem("rememberUser", JSON.stringify(user));
+      } else {
+        localStorage.removeItem("rememberUser");
+      }
+
+      showAlert('✅ تسجيل الدخول ناجح! جاري التحويل...', 'success');
+      
+      setTimeout(() => {
+        window.location.href = "attendance.html";
+      }, 2000);
+    } else {
+      showAlert('❌ بيانات الدخول غير صحيحة! تحقق من البريد والمرور', 'error');
+      document.getElementById('loginEmail').classList.add('input-error');
+      document.getElementById('loginPassword').classList.add('input-error');
+      
+      loginBtn.disabled = false;
+      spinner.style.display = 'none';
     }
-
-    showAlert('✅ تسجيل الدخول ناجح! جاري التحويل...', 'success');
-    
-    setTimeout(() => {
-      window.location.href = "attendance.html";
-    }, 2000);
-  } else {
-    showAlert('❌ بيانات الدخول غير صحيحة! تحقق من البريد والباسورد', 'error');
-    document.getElementById('loginEmail').classList.add('input-error');
-    document.getElementById('loginPassword').classList.add('input-error');
-  }
+  }, 800);
 }
 
 // عند تحميل الصفحة، إذا كان هناك بيانات محفوظة
@@ -415,10 +575,21 @@ window.addEventListener('load', function() {
 });
 
 // إزالة الخطأ عند بدء الكتابة
-document.querySelectorAll('input').forEach(input => {
-  input.addEventListener('focus', function() {
+['loginEmail', 'loginPassword'].forEach(id => {
+  document.getElementById(id).addEventListener('focus', function() {
     this.classList.remove('input-error');
   });
+
+  document.getElementById(id).addEventListener('input', function() {
+    this.classList.remove('input-error');
+  });
+});
+
+// معالجة الضغط على Enter
+document.getElementById('loginForm').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    login();
+  }
 });
 </script>
 </body>
