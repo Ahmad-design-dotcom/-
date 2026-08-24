@@ -21,15 +21,18 @@
 </head>
 <body>
 
+<!-- شاشة إنشاء حساب -->
 <div id="registerScreen">
   <h1>📝 إنشاء حساب جديد</h1>
   <input type="text" id="regName" placeholder="الاسم الكامل"><br>
   <input type="text" id="regPhone" placeholder="رقم الهاتف"><br>
   <input type="email" id="regEmail" placeholder="البريد الإلكتروني"><br>
   <input type="password" id="regPassword" placeholder="كلمة السر"><br><br>
-  <button onclick="register()">إنشاء الحساب</button>
+  <button onclick="register()">إنشاء الحساب</button><br><br>
+  <button onclick="goToLogin()">لدي حساب بالفعل</button>
 </div>
 
+<!-- شاشة تسجيل دخول -->
 <div id="loginScreen" style="display:none;">
   <h1>🔐 تسجيل دخول</h1>
   <input type="text" id="loginName" placeholder="الاسم"><br>
@@ -37,6 +40,7 @@
   <button onclick="login()">دخول</button>
 </div>
 
+<!-- التطبيق الرئيسي -->
 <div id="mainApp">
   <h1>📌 نظام الحضور والانصراف</h1>
 
@@ -82,6 +86,7 @@ function saveData() {
   localStorage.setItem("attendance", JSON.stringify(records));
 }
 
+// إنشاء حساب
 function register() {
   let name = document.getElementById("regName").value;
   let phone = document.getElementById("regPhone").value;
@@ -95,6 +100,13 @@ function register() {
   document.getElementById("loginScreen").style.display = "block";
 }
 
+// زر "لدي حساب بالفعل"
+function goToLogin() {
+  document.getElementById("registerScreen").style.display = "none";
+  document.getElementById("loginScreen").style.display = "block";
+}
+
+// تسجيل دخول
 function login() {
   let name = document.getElementById("loginName").value;
   let password = document.getElementById("loginPassword").value;
@@ -108,115 +120,6 @@ function login() {
     alert("❌ بيانات الدخول غير صحيحة!");
   }
 }
-
-function checkIn() {
-  checkInTime = new Date();
-  alert("تم تسجيل الدخول: " + checkInTime.toLocaleString("ar-EG"));
-}
-
-function checkOut() {
-  if (!checkInTime) { alert("لازم تسجل دخول الأول"); return; }
-  let checkOutTime = new Date();
-  let hours = (checkOutTime - checkInTime) / (1000*60*60);
-
-  let salary = document.getElementById("monthlySalary").value;
-  let hourRate = (salary / 30 / 12).toFixed(2);
-  let dailySalary = (hours * hourRate).toFixed(2);
-
-  records.push({
-    date: new Date().toLocaleDateString("ar-EG"),
-    in: checkInTime.toLocaleTimeString("ar-EG"),
-    out: checkOutTime.toLocaleTimeString("ar-EG"),
-    hours: hours.toFixed(2),
-    value: dailySalary,
-    leave: "",
-    loan: "",
-    deduction: ""
-  });
-
-  checkInTime = null;
-  renderTable();
-  saveData();
-}
-
-function addLeave(type) {
-  if (type === "مدفوعة") {
-    if (paidLeaves >= 4) {
-      alert("❌ تم نفاذ رصيد الإجازات المدفوعة لهذا الشهر!");
-      return;
-    }
-    paidLeaves++;
-  }
-
-  let salary = document.getElementById("monthlySalary").value;
-  let dailySalary = (salary / 30).toFixed(2);
-
-  records.push({
-    date: new Date().toLocaleDateString("ar-EG"),
-    in: "-",
-    out: "-",
-    hours: "0",
-    value: type === "مدفوعة" ? dailySalary : "0",
-    leave: type,
-    loan: "",
-    deduction: ""
-  });
-  renderTable();
-  saveData();
-}
-
-function addLoan() {
-  let loan = prompt("أدخل قيمة السُلفة:");
-  if (loan) {
-    records.push({
-      date: new Date().toLocaleDateString("ar-EG"),
-      in: "-",
-      out: "-",
-      hours: "0",
-      value: "0",
-      leave: "",
-      loan: loan,
-      deduction: ""
-    });
-    renderTable();
-    saveData();
-  }
-}
-
-function addDeduction() {
-  let deduction = prompt("أدخل قيمة الخصم:");
-  if (deduction) {
-    records.push({
-      date: new Date().toLocaleDateString("ar-EG"),
-      in: "-",
-      out: "-",
-      hours: "0",
-      value: "0",
-      leave: "",
-      loan: "",
-      deduction: deduction
-    });
-    renderTable();
-    saveData();
-  }
-}
-
-function resetMonth() {
-  if (confirm("⚠️ هل أنت متأكد أنك تريد إعادة الشهر من جديد؟ سيتم مسح كل البيانات!")) {
-    records = [];
-    paidLeaves = 0;
-    saveData();
-    renderTable();
-  }
-}
-
-function renderTable() {
-  let table = document.getElementById("attendanceTable");
-  table.innerHTML = `
-    <tr>
-      <th>التاريخ</th>
-      <th>وقت الدخول</th>
-      <th>وقت الخروج</th>
-      <th>عدد الساعات</th>
-      <th>قيمة اليوم</th>
-      <th>نوع الإجازة
+</script>
+</body>
+</html>
