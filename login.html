@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل دخول</title>
+</head>
+<body>
+  <h1>🔐 تسجيل دخول</h1>
+  <form onsubmit="login(); return false;">
+    <input type="text" id="loginName" placeholder="الاسم" required><br>
+    <input type="password" id="loginPassword" placeholder="كلمة السر" required><br>
+    <label><input type="checkbox" id="rememberMe"> حفظ تسجيل الدخول</label><br><br>
+    <button type="submit">دخول</button>
+  </form>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+function login() {
+  let name = document.getElementById("loginName").value;
+  let password = document.getElementById("loginPassword").value;
+  let remember = document.getElementById("rememberMe").checked;
+
+  let user = users.find(u => u.name === name && u.password === password);
+  if (user) {
+    if (remember) localStorage.setItem("loggedUser", JSON.stringify(user));
+    else localStorage.removeItem("loggedUser");
+    alert("✅ تسجيل الدخول ناجح!");
+    window.location.href = "attendance.html";
+  } else {
+    alert("❌ بيانات الدخول غير صحيحة!");
+  }
+}
+</script>
+</body>
+</html>
