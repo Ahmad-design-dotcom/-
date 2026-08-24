@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نظام الحضور والانصراف</title>
+  <style>
+    body { font-family: Tahoma; direction: rtl; text-align: right; }
+    button { margin: 5px; padding: 10px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+    th { background: #eee; }
+  </style>
+</head>
+<body>
+  <h1>📌 نظام الحضور والانصراف</h1>
+
+  <label>المرتب الشهري: <input type="number" id="monthlySalary" value="5000"></label><br><br>
+
+  <button onclick="checkIn()">تسجيل دخول</button>
+  <button onclick="checkOut()">تسجيل خروج</button>
+  <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
+  <button onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
+
+  <table id="attendanceTable">
+    <tr>
+      <th>التاريخ</th>
+      <th>وقت الدخول</th>
+      <th>وقت الخروج</th>
+      <th>عدد الساعات</th>
+      <th>قيمة اليوم</th>
+      <th>نوع الإجازة</th>
+    </tr>
+  </table>
+
+  <h2 id="summary">ملخص المرتب الشهري: 0 جنيه</h2>
+
+<script>
+let records = [];
+let checkInTime = null;
+
+function checkIn() {
+  checkInTime = new Date();
+  alert("تم تسجيل الدخول: " + checkInTime.toLocaleString("ar-EG"));
+}
+
+function checkOut() {
+  if (!checkInTime) { alert("لازم تسجل دخول الأول"); return; }
+  let checkOutTime = new Date();
+  let hours = (checkOutTime - checkInTime) / (1000*60*60);
+  let salary = document.getElementById("monthlySalary").value;
+  let dailySalary = (salary / 30).toFixed(2);
+
+  records.push({
+    date: new Date().toLocaleDateString("ar-EG"),
+    in: checkInTime.toLocaleTimeString("ar-EG"),
+    out: checkOutTime.toLocaleTimeString("ar-EG"),
+    hours: hours.toFixed(2),
+    value: dailySalary,
+    leave: ""
+  });
+
+  renderTable();
+  checkInTime = null;
+}
+
+function addLeave(type) {
+  records.push({
+    date: new Date().toLocaleDateString("ar-EG"),
+    in: "-",
+    out: "-",
+    hours: "0",
+    value: type === "مدفوعة" ? (document.getElementById("monthlySalary").value / 30).toFixed(2) : "0",
+    leave: type
+  });
+  renderTable();
+}
+
+function renderTable() {
+  let table = document.getElementById("attendanceTable");
+  table.innerHTML = `
+    <tr>
+      <th>التاريخ</th>
+      <th>وقت الدخول</th>
+      <th>وقت الخروج</th>
+      <th>عدد الساعات</th>
+      <th>قيمة اليوم</th>
+      <th>نوع الإجازة</th>
+    </tr>`;
+  let total = 0;
+  records.forEach(r => {
+    table.innerHTML += `
+      <tr>
+        <td>${r.date}</td>
+        <td>${r.in}</td>
+        <td>${r.out}</td>
+        <td>${r.hours}</td>
+        <td>${r.value}</td>
+        <td>${r.leave}</td>
+      </tr>`;
+    total += parseFloat(r.value);
+  });
+  document.getElementById("summary").innerText = "ملخص المرتب الشهري: " + total.toFixed(2) + " جنيه";
+}
+</script>
+</body>
+</html>
