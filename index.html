@@ -8,31 +8,18 @@
       font-family: 'Tahoma', sans-serif;
       direction: rtl;
       text-align: center;
-      background: #f4f6f9;
+      background: linear-gradient(135deg, #4a148c, #2196f3);
+      color: #fff;
       margin: 0;
       padding: 40px 10px;
     }
-    h1 {
-      color: #4a148c;
-      font-size: 26px;
-      margin-bottom: 10px;
-    }
-    p {
-      font-size: 16px;
-      color: #333;
-      margin-bottom: 25px;
-    }
+    h1 { font-size: 26px; margin-bottom: 10px; }
+    p { font-size: 16px; margin-bottom: 25px; }
     .btn {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 10px auto;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
+      display: block; width: 90%; max-width: 300px;
+      margin: 10px auto; padding: 12px;
+      font-size: 16px; border: none; border-radius: 8px;
+      cursor: pointer; transition: 0.3s;
     }
     .btn:hover { opacity: 0.85; }
     .btn-register { background: #4caf50; color: #fff; }
@@ -43,7 +30,6 @@
 <body>
   <h1>👋 مرحبًا بك في نظام الحضور والانصراف</h1>
   <p>اختر الصفحة التي تريد الدخول إليها:</p>
-
   <button class="btn btn-register" onclick="window.location.href='register.html'">إنشاء حساب جديد</button>
   <button class="btn btn-login" onclick="window.location.href='login.html'">تسجيل دخول</button>
   <button class="btn btn-attendance" onclick="window.location.href='attendance.html'">صفحة الحضور والانصراف</button>
