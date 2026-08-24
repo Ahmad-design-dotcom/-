@@ -2,54 +2,523 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إنشاء حساب جديد</title>
   <style>
-    body { font-family:'Tahoma'; text-align:center; background:linear-gradient(135deg,#4a148c,#2196f3); color:#fff; margin:0; padding:40px 10px; }
-    h1 { font-size:26px; margin-bottom:10px; }
-    input,button { display:block; width:90%; max-width:300px; margin:10px auto; padding:10px; border-radius:8px; border:none; }
-    button { background:#4caf50; color:#fff; font-size:16px; cursor:pointer; }
-    #homeBtn { background:#1976d2; margin-top:15px; }
-    a { color:#fff; text-decoration:underline; display:block; margin-top:15px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 20px;
+      padding: 40px 25px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #999;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #555;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    .password-toggle {
+      position: absolute;
+      left: 15px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #667eea;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .password-toggle:hover {
+      color: #764ba2;
+      transform: scale(1.1);
+    }
+
+    input[type="password"] {
+      padding-left: 45px;
+    }
+
+    .form-group.password-group input {
+      padding-left: 45px;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 50px;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-register {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-home {
+      background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    .link-section {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .link-text {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .link-text a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .link-text a:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .alert.error {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef5350;
+      display: block;
+    }
+
+    .alert.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #4caf50;
+      display: block;
+    }
+
+    .input-error {
+      border-color: #f44336 !important;
+    }
+
+    .loading {
+      display: none;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .card {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .header-icon {
+        font-size: 40px;
+      }
+
+      input {
+        padding: 12px 14px;
+        font-size: 14px;
+      }
+
+      .btn {
+        padding: 12px;
+        font-size: 15px;
+        min-height: 45px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .card {
+        padding: 25px 15px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .header-icon {
+        font-size: 36px;
+      }
+
+      input {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 10px;
+        font-size: 14px;
+        min-height: 42px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>📝 إنشاء حساب جديد</h1>
-  <form onsubmit="register(); return false;">
-    <input id="regName" placeholder="الاسم الكامل" required>
-    <input id="regPassword" type="password" placeholder="كلمة السر" required>
-    <input id="regSalary" type="number" placeholder="المرتب الشهري" required>
-    <input id="regHours" type="number" placeholder="عدد ساعات العمل" required>
-    <button type="submit">إنشاء الحساب</button>
-  </form>
-  <a href="login.html">لدي حساب بالفعل؟ تسجيل دخول</a>
-  <button id="homeBtn" onclick="window.location.href='index.html'">🏠 العودة للصفحة الرئيسية</button>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="header-icon">📝</div>
+        <h1>إنشاء حساب جديد</h1>
+        <p class="subtitle">أنشئ حسابك الآن وابدأ تسجيل الحضور والانصراف</p>
+      </div>
+
+      <div id="alertBox" class="alert"></div>
+
+      <form id="registerForm" onsubmit="register(); return false;">
+        <div class="form-group">
+          <label for="regName">👤 الاسم الكامل</label>
+          <div class="input-wrapper">
+            <input 
+              id="regName" 
+              type="text"
+              placeholder="أدخل اسمك الكامل"
+              required
+              autocomplete="name"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">📧 البريد الإلكتروني</label>
+          <div class="input-wrapper">
+            <input 
+              id="regEmail" 
+              type="email"
+              placeholder="أدخل بريدك الإلكتروني"
+              required
+              autocomplete="email"
+            >
+          </div>
+        </div>
+
+        <div class="form-group password-group">
+          <label for="regPassword">🔐 كلمة السر</label>
+          <div class="input-wrapper">
+            <input 
+              id="regPassword" 
+              type="password"
+              placeholder="أدخل كلمة السر (8 أحرف على الأقل)"
+              required
+              autocomplete="new-password"
+              minlength="8"
+            >
+            <button type="button" class="password-toggle" onclick="togglePassword('regPassword')">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group password-group">
+          <label for="regConfirmPassword">🔐 تأكيد كلمة السر</label>
+          <div class="input-wrapper">
+            <input 
+              id="regConfirmPassword" 
+              type="password"
+              placeholder="أعد إدخال كلمة السر"
+              required
+              autocomplete="new-password"
+              minlength="8"
+            >
+            <button type="button" class="password-toggle" onclick="togglePassword('regConfirmPassword')">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regSalary">💰 المرتب الشهري</label>
+          <div class="input-wrapper">
+            <input 
+              id="regSalary" 
+              type="number"
+              placeholder="أدخل المرتب الشهري"
+              required
+              step="0.01"
+              min="0"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regHours">⏰ عدد ساعات العمل يومياً</label>
+          <div class="input-wrapper">
+            <input 
+              id="regHours" 
+              type="number"
+              placeholder="أدخل عدد ساعات العمل"
+              required
+              step="0.5"
+              min="1"
+              max="24"
+            >
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-register">
+            <span>✅ إنشاء الحساب</span>
+            <span class="loading" id="loading">
+              <div class="spinner"></div>
+            </span>
+          </button>
+          <button type="button" class="btn btn-home" onclick="window.location.href='index.html'">
+            🏠 الصفحة الرئيسية
+          </button>
+        </div>
+      </form>
+
+      <div class="link-section">
+        <p class="link-text">لديك حساب بالفعل؟ 
+          <a href="login.html">تسجيل دخول</a>
+        </p>
+      </div>
+    </div>
+  </div>
 
 <script>
-let users = JSON.parse(localStorage.getItem("users")) || [];
+function togglePassword(fieldId) {
+  const field = document.getElementById(fieldId);
+  const type = field.type === 'password' ? 'text' : 'password';
+  field.type = type;
+}
+
+function showAlert(message, type) {
+  const alertBox = document.getElementById('alertBox');
+  alertBox.textContent = message;
+  alertBox.className = 'alert ' + type;
+  setTimeout(() => {
+    alertBox.className = 'alert';
+  }, 5000);
+}
+
 function register() {
-  let name = document.getElementById("regName").value;
-  let password = document.getElementById("regPassword").value;
-  let salary = document.getElementById("regSalary").value;
-  let hours = document.getElementById("regHours").value;
-  
-  // التحقق من عدم وجود حساب بنفس الاسم
-  if (users.find(u => u.name === name)) {
-    alert("❌ هذا الاسم موجود بالفعل!");
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const confirmPassword = document.getElementById('regConfirmPassword').value;
+  const salary = document.getElementById('regSalary').value;
+  const hours = document.getElementById('regHours').value;
+
+  // التحقق من صحة البيانات
+  if (!name || name.length < 3) {
+    showAlert('❌ يرجى إدخال اسم صحيح (3 أحرف على الأقل)', 'error');
+    document.getElementById('regName').classList.add('input-error');
     return;
   }
-  
+
+  if (!email.includes('@')) {
+    showAlert('❌ يرجى إدخال بريد إلكتروني صحيح', 'error');
+    document.getElementById('regEmail').classList.add('input-error');
+    return;
+  }
+
+  if (password.length < 8) {
+    showAlert('❌ كلمة السر يجب أن تكون 8 أحرف على الأقل', 'error');
+    document.getElementById('regPassword').classList.add('input-error');
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    showAlert('❌ كلمات السر غير متطابقة', 'error');
+    document.getElementById('regConfirmPassword').classList.add('input-error');
+    return;
+  }
+
+  if (!salary || salary <= 0) {
+    showAlert('❌ يرجى إدخال مرتب صحيح', 'error');
+    document.getElementById('regSalary').classList.add('input-error');
+    return;
+  }
+
+  if (!hours || hours <= 0 || hours > 24) {
+    showAlert('❌ يرجى إدخال عدد ساعات صحيح', 'error');
+    document.getElementById('regHours').classList.add('input-error');
+    return;
+  }
+
+  // التحقق من عدم وجود بريد مكرر
+  let users = JSON.parse(localStorage.getItem("users")) || [];
+  if (users.find(u => u.email === email)) {
+    showAlert('❌ هذا البريد الإلكتروني مسجل بالفعل!', 'error');
+    document.getElementById('regEmail').classList.add('input-error');
+    return;
+  }
+
+  if (users.find(u => u.name === name)) {
+    showAlert('❌ هذا الاسم مسجل بالفعل!', 'error');
+    document.getElementById('regName').classList.add('input-error');
+    return;
+  }
+
+  // إنشاء الحساب
   let user = {
     name: name,
+    email: email,
     password: password,
     salary: salary,
-    hours: hours
+    hours: hours,
+    createdAt: new Date().toLocaleDateString("ar-EG")
   };
+
   users.push(user);
   localStorage.setItem("users", JSON.stringify(users));
   localStorage.setItem("loggedUser", JSON.stringify(user));
-  alert("✅ تم إنشاء الحساب بنجاح!");
-  window.location.href = "attendance.html";
+
+  showAlert('✅ تم إنشاء الحساب بنجاح! جاري التحويل...', 'success');
+  
+  // إزالة أي أخطاء سابقة
+  document.querySelectorAll('.input-error').forEach(input => {
+    input.classList.remove('input-error');
+  });
+
+  setTimeout(() => {
+    window.location.href = "attendance.html";
+  }, 2000);
 }
+
+// إزالة الخطأ عند بدء الكتابة
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('focus', function() {
+    this.classList.remove('input-error');
+  });
+});
 </script>
 </body>
 </html>
