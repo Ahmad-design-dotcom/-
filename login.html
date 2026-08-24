@@ -4,34 +4,18 @@
   <meta charset="UTF-8">
   <title>تسجيل دخول</title>
   <style>
-    body {
-      font-family: 'Tahoma', sans-serif;
-      direction: rtl; text-align: center;
-      background: linear-gradient(135deg, #4a148c, #2196f3);
-      color: #fff; margin: 0; padding: 40px 10px;
-    }
-    h1 { color: #fff; font-size: 26px; margin-bottom: 10px; }
-    input {
-      display: block; width: 90%; max-width: 300px;
-      margin: 10px auto; padding: 10px;
-      border: none; border-radius: 8px; font-size: 15px;
-    }
-    button {
-      display: block; width: 90%; max-width: 300px;
-      margin: 15px auto; padding: 12px;
-      font-size: 16px; border: none; border-radius: 8px;
-      cursor: pointer; background: #2196f3; color: #fff;
-    }
-    button:hover { opacity: 0.85; }
-    a { color: #fff; text-decoration: underline; font-size: 14px; }
+    body { font-family:'Tahoma'; text-align:center; background:linear-gradient(135deg,#4a148c,#2196f3); color:#fff; margin:0; padding:40px 10px; }
+    h1 { font-size:26px; margin-bottom:10px; }
+    input,button { display:block; width:90%; max-width:300px; margin:10px auto; padding:10px; border-radius:8px; border:none; }
+    button { background:#2196f3; color:#fff; font-size:16px; cursor:pointer; }
+    a { color:#fff; text-decoration:underline; }
   </style>
 </head>
 <body>
   <h1>🔐 تسجيل دخول</h1>
   <form onsubmit="login(); return false;">
-    <input type="text" id="loginName" placeholder="الاسم" required>
-    <input type="password" id="loginPassword" placeholder="كلمة السر" required>
-    <label><input type="checkbox" id="rememberMe"> حفظ تسجيل الدخول</label>
+    <input id="loginName" placeholder="الاسم" required>
+    <input id="loginPassword" type="password" placeholder="كلمة السر" required>
     <button type="submit">دخول</button>
   </form>
   <a href="register.html">ليس لديك حساب؟ أنشئ حساب جديد</a>
@@ -41,11 +25,9 @@ let users = JSON.parse(localStorage.getItem("users")) || [];
 function login() {
   let name = document.getElementById("loginName").value;
   let password = document.getElementById("loginPassword").value;
-  let remember = document.getElementById("rememberMe").checked;
   let user = users.find(u => u.name === name && u.password === password);
   if (user) {
-    if (remember) localStorage.setItem("loggedUser", JSON.stringify(user));
-    else localStorage.removeItem("loggedUser");
+    localStorage.setItem("loggedUser", JSON.stringify(user));
     alert("✅ تسجيل الدخول ناجح!");
     window.location.href = "attendance.html";
   } else {
