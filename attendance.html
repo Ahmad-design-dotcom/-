@@ -10,6 +10,10 @@
       background: linear-gradient(135deg, #4a148c, #2196f3);
       color: #fff; margin: 0; padding: 20px;
     }
+    #headerBar {
+      display: flex; justify-content: space-between;
+      padding: 10px 20px; font-weight: bold;
+    }
     h1 { font-size: 26px; margin-bottom: 10px; }
     p { font-size: 16px; margin-bottom: 20px; }
     button {
@@ -32,7 +36,6 @@
     th { background:#eee; }
     #summary { margin-top:20px; font-size:18px; }
     footer { margin-top:30px; font-size:14px; color:#fff; }
-    #headerBar { display:flex; justify-content:space-between; padding:10px; font-weight:bold; }
   </style>
 </head>
 <body>
@@ -87,12 +90,14 @@ if (!currentUser) {
 
 document.getElementById("userSalary").innerText = currentUser.salary;
 
-// تحديث التحية والوقت
+// تحديث التحية والوقت والتاريخ
 function updateHeader() {
   let now = new Date();
-  let greeting = now.getHours() < 12 ? "☀️ صباح الخير " : "🌙 مساء الخير ";
+  let days = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  let greeting = now.getHours() < 12 ? "☀️ صباح الخير يا " : "🌙 مساء الخير يا ";
   document.getElementById("greeting").innerText = greeting + currentUser.name;
-  document.getElementById("dateTime").innerText = now.toLocaleString("ar-EG");
+  document.getElementById("dateTime").innerText =
+    `${days[now.getDay()]} - ${now.toLocaleDateString("ar-EG")} - ${now.toLocaleTimeString("ar-EG")}`;
 }
 updateHeader();
 setInterval(updateHeader, 60000);
@@ -203,17 +208,4 @@ function resetMonth() {
 
 function logout() {
   localStorage.removeItem("loggedUser");
-  window.location.href = "login.html";
-}
-
-function openWhatsApp() {
-  window.open("https://wa.me/201102975929", "_blank");
-}
-
-function renderTable() {
-  let table = document.getElementById("attendanceTable");
-  table.innerHTML = `<tr>
-      <th>التاريخ</th><th>وقت الدخول</th><th>وقت الخروج</th><th>عدد الساعات</th><th>قيمة اليوم</th><th>نوع الإجازة</th><th>السُلفة</th><th>الخصم</th>
-    </tr>`;
-  let total = 0;
-  records.forEach(r =>
+  window.location.href = "login.html
