@@ -17,6 +17,7 @@
     #unpaidLeaveBtn { background:#9c27b0; color:#fff; }
     #resetBtn { background:#ff9800; color:#fff; }
     #logoutBtn { background:#424242; color:#fff; }
+    #homeBtn { background:#1976d2; color:#fff; margin-top:15px; }
     table { border-collapse:collapse; width:95%; margin:20px auto; background:#fff; color:#000; border-radius:8px; }
     th, td { border:1px solid #ccc; padding:10px; text-align:center; }
     th { background:#eee; }
@@ -41,6 +42,7 @@
   <button id="deductionBtn" onclick="addDeduction()">إضافة خصم</button>
   <button id="resetBtn" onclick="resetMonth()">إعادة تسجيل الشهر</button>
   <button id="logoutBtn" onclick="logout()">تسجيل الخروج من الحساب</button>
+  <button id="homeBtn" onclick="window.location.href='index.html'">🏠 العودة للصفحة الرئيسية</button>
 
   <table id="attendanceTable">
     <tr>
@@ -120,6 +122,7 @@ function checkOut() {
   renderTable();
   checkInTime = null;
   checkedIn = false;
+  alert("✅ انصراف: " + checkOutTime.toLocaleTimeString("ar-EG"));
 }
 
 function addLeave(type) {
@@ -131,16 +134,27 @@ function addLeave(type) {
     records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:type, loan:"", deduction:"" });
   }
   saveData(); renderTable();
+  alert("✅ تم إضافة إجازة " + type);
 }
 
 function addLoan() {
   let loan = prompt("أدخل قيمة السُلفة:");
-  if (loan) { records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:loan, deduction:"" }); saveData(); renderTable(); }
+  if (loan && loan > 0) { 
+    records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:loan, deduction:"" }); 
+    saveData(); 
+    renderTable(); 
+    alert("✅ تم إضافة سُلفة: " + loan + " جنيه");
+  }
 }
 
 function addDeduction() {
   let deduction = prompt("أدخل قيمة الخصم:");
-  if (deduction) { records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:"", deduction:deduction }); saveData(); renderTable(); }
+  if (deduction && deduction > 0) { 
+    records.push({ date:new Date().toLocaleDateString("ar-EG"), in:"-", out:"-", hours:"0", value:"0", leave:"", loan:"", deduction:deduction }); 
+    saveData(); 
+    renderTable(); 
+    alert("✅ تم إضافة خصم: " + deduction + " جنيه");
+  }
 }
 
 // ✅ زر إعادة الشهر مع تأكيد
@@ -156,6 +170,7 @@ function resetMonth() {
 
 function logout() {
   localStorage.removeItem("loggedUser");
+  alert("👋 تم تسجيل الخروج بنجاح!");
   window.location.href = "login.html";
 }
 
@@ -169,4 +184,19 @@ function renderTable() {
     table.innerHTML += `<tr>
       <td>${r.date}</td><td>${r.in}</td><td>${r.out}</td><td>${r.hours}</td><td>${r.value}</td><td>${r.leave}</td><td>${r.loan}</td><td>${r.deduction}</td>
     </tr>`;
-    total += parseFloat(r.value
+    total += parseFloat(r.value) || 0;
+  });
+  
+  let loans = records.reduce((sum, r) => sum + (parseFloat(r.loan) || 0), 0);
+  let deductions = records.reduce((sum, r) => sum + (parseFloat(r.deduction) || 0), 0);
+  let finalTotal = total - loans - deductions;
+  
+  document.getElementById("summary").innerHTML = `ملخص المرتب الشهري: ${finalTotal.toFixed(2)} جنيه<br>
+    <small>(الراتب: ${total.toFixed(2)} - السُلف: ${loans.toFixed(2)} - الخصومات: ${deductions.toFixed(2)})</small>`;
+}
+
+// تحديث الجدول عند التحميل
+renderTable();
+</script>
+</body>
+</html>
