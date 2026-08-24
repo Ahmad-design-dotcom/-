@@ -17,6 +17,9 @@
     footer a { color:#4caf50; text-decoration:none; }
     #loginScreen, #registerScreen { text-align:center; padding:50px; }
     #mainApp { display:none; }
+    #checkinBtn { background:#4caf50; color:#fff; }
+    #checkoutBtn { background:#f44336; color:#fff; }
+    #logoutBtn { background:#607d8b; color:#fff; }
   </style>
 </head>
 <body>
@@ -46,14 +49,15 @@
   <h1>📌 نظام الحضور والانصراف</h1>
 
   <div style="text-align:center;">
-    <label>💰 المرتب الشهري: <input type="number" id="monthlySalary"></label><br><br>
-    <button onclick="checkIn()">تسجيل دخول</button>
-    <button onclick="checkOut()">تسجيل خروج</button>
+    <p>💰 مرتبك: <span id="userSalary"></span> جنيه</p><br>
+    <button id="checkinBtn" onclick="checkIn()">حضور</button>
+    <button id="checkoutBtn" onclick="checkOut()">انصراف</button>
     <button onclick="addLeave('مدفوعة')">إجازة مدفوعة</button>
     <button onclick="addLeave('غير مدفوعة')">إجازة غير مدفوعة</button>
     <button onclick="addLoan()">إضافة سُلفة</button>
     <button onclick="addDeduction()">إضافة خصم</button>
     <button onclick="resetMonth()">إعادة الشهر</button>
+    <button id="logoutBtn" onclick="logout()">تسجيل الخروج من الحساب</button>
   </div>
 
   <table id="attendanceTable">
@@ -118,9 +122,52 @@ function login() {
     currentUser = user;
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("mainApp").style.display = "block";
-    document.getElementById("monthlySalary").value = user.salary || 6000;
+    document.getElementById("userSalary").innerText = user.salary || 0;
   } else {
     alert("❌ بيانات الدخول غير صحيحة!");
+  }
+}
+
+// تسجيل خروج من الحساب
+function logout() {
+  currentUser = null;
+  document.getElementById("mainApp").style.display = "none";
+  document.getElementById("loginScreen").style.display = "block";
+}
+
+// حضور
+function checkIn() {
+  if (confirm("هل تريد تسجيل حضور الآن؟")) {
+    checkInTime = new Date();
+    alert("✅ تم تسجيل الحضور: " + checkInTime.toLocaleString("ar-EG"));
+  }
+}
+
+// انصراف
+function checkOut() {
+  if (!checkInTime) { alert("لازم تسجل حضور الأول"); return; }
+  if (confirm("هل تريد تسجيل انصراف الآن؟")) {
+    let checkOutTime = new Date();
+    let hours = (checkOutTime - checkInTime) / (1000*60*60);
+
+    let salary = currentUser.salary || 0;
+    let hourRate = (salary / 30 / 12).toFixed(2);
+    let dailySalary = (hours * hourRate).toFixed(2);
+
+    records.push({
+      date: new Date().toLocaleDateString("ar-EG"),
+      in: checkInTime.toLocaleTimeString("ar-EG"),
+      out: checkOutTime.toLocaleTimeString("ar-EG"),
+      hours: hours.toFixed(2),
+      value: dailySalary,
+      leave: "",
+      loan: "",
+      deduction: ""
+    });
+
+    checkInTime = null;
+    renderTable();
+    saveData();
   }
 }
 </script>
