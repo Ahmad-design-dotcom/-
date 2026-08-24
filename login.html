@@ -2,40 +2,424 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تسجيل دخول</title>
   <style>
-    body { font-family:'Tahoma'; text-align:center; background:linear-gradient(135deg,#4a148c,#2196f3); color:#fff; margin:0; padding:40px 10px; }
-    h1 { font-size:26px; margin-bottom:10px; }
-    input,button { display:block; width:90%; max-width:300px; margin:10px auto; padding:10px; border-radius:8px; border:none; }
-    button { background:#2196f3; color:#fff; font-size:16px; cursor:pointer; }
-    #homeBtn { background:#1976d2; margin-top:15px; }
-    a { color:#fff; text-decoration:underline; display:block; margin-top:15px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 20px;
+      padding: 40px 25px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #999;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #555;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    .password-toggle {
+      position: absolute;
+      left: 15px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #667eea;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .password-toggle:hover {
+      color: #764ba2;
+      transform: scale(1.1);
+    }
+
+    input[type="password"] {
+      padding-left: 45px;
+    }
+
+    .form-group.password-group input {
+      padding-left: 45px;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 50px;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #2196f3 0%, #0b7dda 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+    }
+
+    .btn-home {
+      background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    .link-section {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .link-text {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .link-text a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .link-text a:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .alert.error {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef5350;
+      display: block;
+    }
+
+    .alert.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #4caf50;
+      display: block;
+    }
+
+    .input-error {
+      border-color: #f44336 !important;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 15px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .remember-me input {
+      width: auto;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .card {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .header-icon {
+        font-size: 40px;
+      }
+
+      input {
+        padding: 12px 14px;
+        font-size: 14px;
+      }
+
+      .btn {
+        padding: 12px;
+        font-size: 15px;
+        min-height: 45px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .card {
+        padding: 25px 15px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .header-icon {
+        font-size: 36px;
+      }
+
+      input {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 10px;
+        font-size: 14px;
+        min-height: 42px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>🔐 تسجيل دخول</h1>
-  <form onsubmit="login(); return false;">
-    <input id="loginName" placeholder="الاسم" required>
-    <input id="loginPassword" type="password" placeholder="كلمة السر" required>
-    <button type="submit">دخول</button>
-  </form>
-  <a href="register.html">ليس لديك حساب؟ أنشئ حساب جديد</a>
-  <button id="homeBtn" onclick="window.location.href='index.html'">🏠 العودة للصفحة الرئيسية</button>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="header-icon">🔐</div>
+        <h1>تسجيل دخول</h1>
+        <p class="subtitle">رحباً بعودتك! سجل دخولك للمتابعة</p>
+      </div>
+
+      <div id="alertBox" class="alert"></div>
+
+      <form id="loginForm" onsubmit="login(); return false;">
+        <div class="form-group">
+          <label for="loginEmail">📧 البريد الإلكتروني أو الاسم</label>
+          <div class="input-wrapper">
+            <input 
+              id="loginEmail" 
+              type="text"
+              placeholder="أدخل بريدك الإلكتروني أو اسمك"
+              required
+              autocomplete="email"
+            >
+          </div>
+        </div>
+
+        <div class="form-group password-group">
+          <label for="loginPassword">🔑 كلمة السر</label>
+          <div class="input-wrapper">
+            <input 
+              id="loginPassword" 
+              type="password"
+              placeholder="أدخل كلمة السر"
+              required
+              autocomplete="current-password"
+            >
+            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe" style="margin: 0; font-weight: normal;">تذكرني</label>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-login">
+            🚀 دخول
+          </button>
+          <button type="button" class="btn btn-home" onclick="window.location.href='index.html'">
+            🏠 الصفحة الرئيسية
+          </button>
+        </div>
+      </form>
+
+      <div class="link-section">
+        <p class="link-text">ليس لديك حساب؟ 
+          <a href="register.html">أنشئ حساب جديد</a>
+        </p>
+      </div>
+    </div>
+  </div>
 
 <script>
-let users = JSON.parse(localStorage.getItem("users")) || [];
+function togglePassword(fieldId) {
+  const field = document.getElementById(fieldId);
+  const type = field.type === 'password' ? 'text' : 'password';
+  field.type = type;
+}
+
+function showAlert(message, type) {
+  const alertBox = document.getElementById('alertBox');
+  alertBox.textContent = message;
+  alertBox.className = 'alert ' + type;
+  setTimeout(() => {
+    alertBox.className = 'alert';
+  }, 5000);
+}
+
 function login() {
-  let name = document.getElementById("loginName").value;
-  let password = document.getElementById("loginPassword").value;
-  let user = users.find(u => u.name === name && u.password === password);
+  const emailOrName = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const rememberMe = document.getElementById('rememberMe').checked;
+
+  if (!emailOrName || !password) {
+    showAlert('❌ يرجى ملء جميع الحقول', 'error');
+    return;
+  }
+
+  let users = JSON.parse(localStorage.getItem("users")) || [];
+  
+  // البحث عن المستخدم باستخدام البريد أو الاسم
+  let user = users.find(u => 
+    (u.email === emailOrName || u.name === emailOrName) && u.password === password
+  );
+
   if (user) {
+    // حفظ بيانات المستخدم في localStorage
     localStorage.setItem("loggedUser", JSON.stringify(user));
-    alert("✅ تسجيل الدخول ناجح!");
-    window.location.href = "attendance.html";
+    
+    // إذا اختار "تذكرني" حفظ البيانات أيضاً
+    if (rememberMe) {
+      localStorage.setItem("rememberUser", JSON.stringify(user));
+    }
+
+    showAlert('✅ تسجيل الدخول ناجح! جاري التحويل...', 'success');
+    
+    setTimeout(() => {
+      window.location.href = "attendance.html";
+    }, 2000);
   } else {
-    alert("❌ بيانات الدخول غير صحيحة!");
+    showAlert('❌ بيانات الدخول غير صحيحة! تحقق من البريد والباسورد', 'error');
+    document.getElementById('loginEmail').classList.add('input-error');
+    document.getElementById('loginPassword').classList.add('input-error');
   }
 }
+
+// عند تحميل الصفحة، إذا كان هناك بيانات محفوظة
+window.addEventListener('load', function() {
+  let savedUser = JSON.parse(localStorage.getItem("rememberUser"));
+  if (savedUser) {
+    document.getElementById('loginEmail').value = savedUser.email || savedUser.name;
+    document.getElementById('rememberMe').checked = true;
+  }
+});
+
+// إزالة الخطأ عند بدء الكتابة
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('focus', function() {
+    this.classList.remove('input-error');
+  });
+});
 </script>
 </body>
 </html>
